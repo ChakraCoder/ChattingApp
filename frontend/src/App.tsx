@@ -5,6 +5,7 @@ import Chat from "./pages/chat";
 import Profile from "./pages/profile";
 import VerifyOtp from "./components/auth/VerifyOtp";
 import ResetPassword from "./components/auth/ResetPassword";
+import ProtectedRoutes from "./components/routes/protectedRoutes";
 
 function App() {
   return (
@@ -14,8 +15,12 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/profile" element={<Profile />} />
+
+          <Route element={<ProtectedRoutes />}>
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/auth" />} />
         </Routes>
       </BrowserRouter>

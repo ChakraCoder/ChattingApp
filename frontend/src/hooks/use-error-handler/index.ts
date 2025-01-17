@@ -5,6 +5,7 @@ export const useErrorHandler = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (error: any) => {
+    console.error(error);
     const message =
       error.response?.data?.error || "An unexpected error occurred.";
     toast({ title: message, variant: "destructive" });

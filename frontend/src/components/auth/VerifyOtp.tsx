@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   InputOTP,
   InputOTPGroup,
@@ -13,6 +13,10 @@ import { resendOtp, verifyOtp } from "@/apis/authApiServices";
 import { STATUS_CODES } from "@/constants/statusCodes";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { useAppDispatch } from "@/app/hooks";
+import { setUser } from "@/app/slice/userSlice";
+import setAuthToken from "@/utils/setAuthToken";
+import { isAuthenticated } from "@/utils/isAuthenticated";
 
 const OtpPage = () => {
   const { toast } = useToast();
@@ -21,10 +25,17 @@ const OtpPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleError = useErrorHandler();
+  const dispatch = useAppDispatch();
 
   // Extract email from query parameters
   const queryParams = new URLSearchParams(location.search);
-  const email = queryParams.get("email");
+  const userEmail = queryParams.get("email");
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate("/profile");
+    }
+  }, [navigate]);
 
   const handleSubmit = async () => {
     try {
@@ -37,17 +48,19 @@ const OtpPage = () => {
       }
 
       // Check if email is present
-      if (!email) {
+      if (!userEmail) {
         navigate("/auth");
         throw new Error("Email is missing in query parameters");
       }
 
       setLoading(true);
       const otp = Number(value);
-      const otpVerify = await verifyOtp({ email, otp });
+      const otpVerify = await verifyOtp({ email: userEmail, otp });
 
       if (otpVerify.status === STATUS_CODES.OK) {
-        navigate("/chat");
+        setAuthToken(otpVerify.data.data.token);
+        dispatch(setUser(otpVerify.data.data));
+        navigate("/profile");
       }
       setLoading(false);
     } catch (error) {
@@ -58,12 +71,12 @@ const OtpPage = () => {
 
   const handleResendOtp = async () => {
     try {
-      if (!email) {
+      if (!userEmail) {
         navigate("/auth");
         throw new Error("Email is missing in query parameters");
       }
       setLoading(true);
-      const otpResend = await resendOtp({ email });
+      const otpResend = await resendOtp({ email: userEmail });
 
       if (otpResend.status === STATUS_CODES.OK) {
         toast({ description: "OTP Resend to Email" });
@@ -119,7 +132,11 @@ const OtpPage = () => {
             className="bg-black text-white py-3 px-6 rounded-lg w-full"
             disabled={loading}
           >
-            {loading ? <Loader2 className="animate-spin w-12 h-12" /> : "Verify OTP"}
+            {loading ? (
+              <Loader2 className="animate-spin w-12 h-12" />
+            ) : (
+              "Verify OTP"
+            )}
           </Button>
         </div>
 

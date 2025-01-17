@@ -32,7 +32,14 @@ export const loginUserService = async ({
 }) => {
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, password: true, isVerify: true },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      password: true,
+      isVerify: true,
+    },
   });
 
   if (!user) {
@@ -51,7 +58,15 @@ export const loginUserService = async ({
   }
 
   // Generate a JWT token upon successful login
-  return generateToken(user.id, JWT_EXPIRY);
+  const token = generateToken(user.id, JWT_EXPIRY);
+
+  return {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    token,
+  };
 };
 
 export const registerUserService = async ({
@@ -104,7 +119,14 @@ export const verifyOtpService = async ({
 }) => {
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, otp: true, otpExpiry: true },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      otp: true,
+      otpExpiry: true,
+    },
   });
 
   if (!user) {
@@ -132,7 +154,15 @@ export const verifyOtpService = async ({
     data: { isVerify: true, otp: null, otpExpiry: null },
   });
 
-  return generateToken(user.id, JWT_EXPIRY);
+  const token = generateToken(user.id, JWT_EXPIRY);
+
+  return {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    token,
+  };
 };
 
 export const resendOtpService = async (email: string) => {

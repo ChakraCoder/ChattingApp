@@ -9,11 +9,16 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { STATUS_CODES } from "@/constants/statusCodes";
 import { useNavigate } from "react-router-dom";
+import { setUser } from "@/app/slice/userSlice";
+import { useDispatch } from "react-redux";
+import setAuthToken from "@/utils/setAuthToken";
 
 const Login = () => {
   const handleError = useErrorHandler();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -26,7 +31,9 @@ const Login = () => {
       setLoading(true);
       const userLogin = await login(data);
       if (userLogin.status === STATUS_CODES.OK) {
-        navigate("/chat");
+        setAuthToken(userLogin.data.data.token)
+        dispatch(setUser(userLogin.data.data));
+        navigate("/profile");
       }
       setLoading(false);
       reset();

@@ -46,8 +46,8 @@ const Signup = () => {
           {...register("firstName", {
             required: "First name is required",
             minLength: {
-              value: 3,
-              message: "First name must be at least 3 characters long",
+              value: 2,
+              message: "First name must be at least 2 characters long",
             },
             pattern: {
               value: /^[A-Za-z]+$/,
@@ -70,8 +70,8 @@ const Signup = () => {
           {...register("lastName", {
             required: "Last name is required",
             minLength: {
-              value: 3,
-              message: "Last name must be at least 3 characters long",
+              value: 2,
+              message: "Last name must be at least 2 characters long",
             },
             pattern: {
               value: /^[A-Za-z]+$/,

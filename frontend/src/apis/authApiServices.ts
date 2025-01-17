@@ -10,28 +10,9 @@ import axios, { AxiosInstance } from "axios";
 
 // Create the Axios instance
 const authApiService: AxiosInstance = axios.create({
-  baseURL: `${getBaseURL()}/auth/`,
+  baseURL: `${getBaseURL()}/api/auth/`,
   timeout: 10000,
 });
-
-// Request interceptor to include auth token in specific requests
-// UserApiService.interceptors.request.use(
-//     (config) => {
-//         let authToken = localStorage.getItem("auth_token");
-
-//         if (authToken) {
-//             // Check if the request URL requires authorization (e.g., cart-related endpoints)
-//             if (config.url.includes("cart") || config.url.includes("review")) {
-//                 config.headers["Authorization"] = `Bearer ${authToken}`;
-//             }
-//         }
-
-//         return config;
-//     },
-//     (error) => {
-//         return Promise.reject(error);
-//     }
-// );
 
 export const login = async (loginPayload: loginPayload) => {
   return await authApiService.post(`login`, loginPayload);

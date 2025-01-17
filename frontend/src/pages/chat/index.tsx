@@ -1,5 +1,10 @@
+import { useAppSelector } from "@/app/hooks";
+
 function Chat() {
-  return <div>Chat</div>;
+  const user = useAppSelector((state) => state.user);
+  console.log("user", user);
+
+  return <div></div>;
 }
 
 export default Chat;

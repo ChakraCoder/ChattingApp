@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { useErrorHandler, useToast } from "@/hooks";
 import { resetPasswordPayload } from "@/types/authTypes";
 import { resetPassword } from "@/apis/authApiServices";
 import { Loader2 } from "lucide-react";
+import { isAuthenticated } from "@/utils/isAuthenticated";
 
 const ResetPassword: React.FC = () => {
   const handleError = useErrorHandler();
@@ -22,6 +23,12 @@ const ResetPassword: React.FC = () => {
     reset,
     formState: { errors },
   } = useForm<resetPasswordPayload>();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate("/profile");
+    }
+  }, [navigate]);
 
   const onSubmit: SubmitHandler<resetPasswordPayload> = async (data) => {
     if (!token) {

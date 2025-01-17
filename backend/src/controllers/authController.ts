@@ -16,10 +16,10 @@ export const loginUserController = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const token = await loginUserService(req.body);
+    const userDetails = await loginUserService(req.body);
     res
       .status(STATUS_CODES.OK)
-      .json({ success: true, message: "Login successful", data: { token } });
+      .json({ success: true, message: "Login successful", data: userDetails });
   } catch (error) {
     console.error("Error during registration:", error);
     next(error);
@@ -55,12 +55,12 @@ export const verifyOtpController = async (
 ): Promise<void> => {
   try {
     // Verify the OTP
-    const token = await verifyOtpService(req.body);
+    const userDetails = await verifyOtpService(req.body);
 
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "OTP Verified Successfully.",
-      data: { token },
+      data: userDetails,
     });
   } catch (error) {
     console.error("Error during OTP verification:", error);

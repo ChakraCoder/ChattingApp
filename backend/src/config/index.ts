@@ -12,7 +12,7 @@ export const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587");
 export const SMTP_USER = process.env.SMTP_USER;
 export const SMTP_PASSWORD = process.env.SMTP_PASSWORD;
 
-export const JWT_SECRET = process.env.JWT_SECRET;
+export const JWT_SECRET = process.env.JWT_SECRET || "YouAreMySecretKey";
 export const JWT_EXPIRY = process.env.JWT_EXPIRY;
 export const JWT_RESET_PASSWORD_EXPIRY = process.env.JWT_RESET_PASSWORD_EXPIRY;
 
