@@ -52,10 +52,15 @@ export const profileService = async (
     updateData.profileImage = profileImage;
   }
 
-  await prisma.user.update({
+  const userDetails = await prisma.user.update({
     where: { id: userId },
     data: updateData,
   });
+
+  return {
+    userName: userDetails.userName,
+    profileImage: userDetails.profileImage,
+  };
 };
 
 export const checkUserNameService = async (

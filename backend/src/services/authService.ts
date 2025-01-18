@@ -81,12 +81,6 @@ export const registerUserService = async ({
     throw new EmailAlreadyExistError();
   }
 
-  // // Check if username exist
-  // const userNameExists = await checkIfUserNameExists(userName);
-  // if (userNameExists) {
-  //   throw new UserNameAlreadyExistError();
-  // }
-
   // Generate OTP and send it
   const otp = generateRandomNumber(4);
   const otpSent = await sendOtpEmail(email, otp);

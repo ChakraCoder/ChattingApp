@@ -21,10 +21,12 @@ import {
 import { useAppDispatch } from "@/app/hooks";
 import { updateUser } from "@/app/slice/userSlice";
 import { Label } from "@radix-ui/react-label";
+import LoadingScreen from "@/common/LoadingScreen";
 
 const Profile = () => {
   const handleError = useErrorHandler();
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [usernameAvailable, setUsernameAvailable] = useState(true);
   const [userDetails, setUserDetails] = useState<profilePayload>();
   const [userName, setUserName] = useState<string | undefined>();
@@ -56,8 +58,15 @@ const Profile = () => {
           }/profile-images/${userDetailsResponse.data.data.profileImage}`
         );
       }
+      dispatch(
+        updateUser({
+          userName: userDetailsResponse.data.data.userName,
+          profileImage: userDetailsResponse.data.data.profileImage,
+        })
+      );
+      setIsLoading(false);
     })();
-  }, [reset]);
+  }, [dispatch, reset]);
 
   // Check username availability
   const handleUserNameChange = async (userName: string) => {
@@ -124,9 +133,8 @@ const Profile = () => {
   const onSubmit: SubmitHandler<profilePayload> = async (data) => {
     try {
       setLoading(true);
-      dispatch(
-        updateUser({ userName: data.userName, profileImage: data.profileImage })
-      );
+
+      console.log(data.profileImage);
 
       // Compare userDetails with form data using fast-deep-equal
       if (equal(data, userDetails)) {
@@ -155,6 +163,12 @@ const Profile = () => {
 
       const response = await updateUserProfile(formData);
       if (response.status === STATUS_CODES.OK) {
+        dispatch(
+          updateUser({
+            userName: response.data.data.userName,
+            profileImage: response.data.data.profileImage,
+          })
+        );
         navigate("/chat");
       }
       setLoading(false);
@@ -165,7 +179,9 @@ const Profile = () => {
     }
   };
 
-  return (
+  return isLoading ? (
+    <LoadingScreen />
+  ) : (
     <>
       <div className="min-h-screen flex items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="bg-white border-2 border-gray-200 shadow-xl w-full max-w-3xl rounded-3xl grid pb-5">

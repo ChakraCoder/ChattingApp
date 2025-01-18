@@ -16,11 +16,12 @@ export const profileController = async (
       req.body.profileImage = req.file.filename;
     }
     // @ts-expect-error req.user-error userController
-    await profileService(req.body, req.user.id);
+    const userDetails = await profileService(req.body, req.user.id);
 
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "Profile added Successfully.",
+      data: userDetails,
     });
   } catch (error) {
     console.error("Error during Profile:", error);
