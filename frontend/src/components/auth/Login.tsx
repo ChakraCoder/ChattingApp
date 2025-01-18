@@ -54,6 +54,7 @@ const Login = () => {
         <Input
           placeholder="Email"
           type="email"
+          autoComplete="off"
           className="rounded-xl p-6"
           {...register("email", {
             required: "Email is required",
@@ -71,6 +72,7 @@ const Login = () => {
         <Input
           placeholder="Password"
           type="password"
+          autoComplete="off"
           className="rounded-xl p-6"
           {...register("password", {
             required: "Password is required",

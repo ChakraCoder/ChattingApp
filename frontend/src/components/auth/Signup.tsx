@@ -42,6 +42,7 @@ const Signup = () => {
         <Input
           placeholder="First Name"
           type="text"
+          autoComplete="off"
           className="rounded-xl p-6"
           {...register("firstName", {
             required: "First name is required",
@@ -66,6 +67,7 @@ const Signup = () => {
         <Input
           placeholder="Last Name"
           type="text"
+          autoComplete="off"
           className="rounded-xl p-6"
           {...register("lastName", {
             required: "Last name is required",
@@ -90,6 +92,7 @@ const Signup = () => {
         <Input
           placeholder="Email"
           type="email"
+          autoComplete="off"
           className="rounded-xl p-6"
           {...register("email", {
             required: "Email is required",
@@ -107,6 +110,7 @@ const Signup = () => {
         <Input
           placeholder="Password"
           type="password"
+          autoComplete="off"
           className="rounded-xl p-6"
           {...register("password", {
             required: "Password is required",
@@ -131,6 +135,7 @@ const Signup = () => {
         <Input
           placeholder="Confirm Password"
           type="password"
+          autoComplete="off"
           className="rounded-xl p-6"
           {...register("confirmPassword", {
             required: "Please confirm your password",

@@ -72,6 +72,7 @@ const ForgotPassword = () => {
           <Input
             placeholder="Email"
             type="email"
+            autoComplete="off"
             className="rounded-xl p-6 col-span-3"
             {...register("email", {
               required: "Email is required",

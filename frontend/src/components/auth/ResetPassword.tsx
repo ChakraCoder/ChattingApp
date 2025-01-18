@@ -76,6 +76,7 @@ const ResetPassword: React.FC = () => {
             <Input
               type="password"
               placeholder="New Password"
+              autoComplete="off"
               className="rounded-lg"
               {...register("password", {
                 required: "Password is required",
@@ -99,6 +100,7 @@ const ResetPassword: React.FC = () => {
             <Input
               type="password"
               placeholder="Confirm Password"
+              autoComplete="off"
               className="rounded-lg"
               {...register("newPassword", {
                 required: "Please confirm your password",

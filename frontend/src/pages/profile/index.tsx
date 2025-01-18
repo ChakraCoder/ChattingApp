@@ -20,14 +20,16 @@ import {
 } from "@/constants/env";
 import { useAppDispatch } from "@/app/hooks";
 import { updateUser } from "@/app/slice/userSlice";
+import { Label } from "@radix-ui/react-label";
 
 const Profile = () => {
   const handleError = useErrorHandler();
   const [loading, setLoading] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState(true);
-  const [userName, setUserName] = useState<string>();
   const [userDetails, setUserDetails] = useState<profilePayload>();
+  const [userName, setUserName] = useState<string | undefined>();
   const [previewImage, setPreviewImage] = useState<string>();
+  const [usernameError, setUsernameError] = useState<string | null>(null);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -43,6 +45,7 @@ const Profile = () => {
     (async () => {
       const userDetailsResponse = await getUserDetails();
       setUserDetails(userDetailsResponse.data.data);
+      setUserName(userDetailsResponse.data.data.userName);
       reset(userDetailsResponse.data.data);
       if (userDetailsResponse.data.data.profileImage) {
         setPreviewImage(
@@ -59,21 +62,52 @@ const Profile = () => {
   // Check username availability
   const handleUserNameChange = async (userName: string) => {
     setUserName(userName);
+    const usernamePattern = /^[a-zA-Z0-9_]*$/;
 
-    if (userName.length >= 3) {
-      try {
-        setLoading(true);
+    if (userName.length < 3) {
+      setUsernameError("Username must be at least 3 characters long");
+      setUsernameAvailable(false);
+      return;
+    }
+
+    if (userName.length > 20) {
+      setUsernameError("Username cannot exceed 20 characters");
+      setUsernameAvailable(false);
+      return;
+    }
+
+    if (!usernamePattern.test(userName)) {
+      setUsernameError(
+        "Username can only contain letters, numbers, and underscores"
+      );
+      setUsernameAvailable(false);
+      return;
+    }
+
+    // Clear error if local validation passes
+    setUsernameError(null);
+
+    try {
+      setLoading(true);
+
+      if (userName != userDetails?.userName) {
         const response = await checkUserNameAvailable(userName);
 
         if (response.status === STATUS_CODES.OK) {
           setUsernameAvailable(true);
+        } else {
+          setUsernameAvailable(false);
         }
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        setUsernameAvailable(false);
-        console.error(error);
       }
+      setUsernameAvailable(true);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      setUsernameAvailable(false);
+      setUsernameError(
+        "An error occurred while checking username availability"
+      );
+      console.error(error);
     }
   };
 
@@ -136,7 +170,7 @@ const Profile = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="bg-white border-2 border-gray-200 shadow-xl w-full max-w-3xl rounded-3xl grid pb-5">
           <div className="flex flex-col items-center justify-center px-6 py-5">
-            <h1 className="font-bold text-3xl px-5 py-5">UPDATE PROFILE</h1>
+            <h1 className="font-bold text-3xl px-5 py-5">Profile</h1>
             {/* Profile Picture */}
             <div className="mb-6">
               <label htmlFor="picture">
@@ -147,6 +181,9 @@ const Profile = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
+                <Label className="flex items-center justify-center mt-1 font-semibold">
+                  Profile Image
+                </Label>
               </label>
               <Input
                 id="picture"
@@ -171,9 +208,11 @@ const Profile = () => {
               className="w-full max-w-md"
             >
               <div className="mb-6">
+                <Label className="font-semibold">Username</Label>
                 <Input
                   placeholder="Username"
                   type="text"
+                  autoComplete="off"
                   className="w-full rounded-xl px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   {...register("userName", {
                     required: "Username is required",
@@ -181,22 +220,32 @@ const Profile = () => {
                       value: 3,
                       message: "Username must be at least 3 characters long",
                     },
+                    maxLength: {
+                      value: 20,
+                      message: "Username cannot exceed 20 characters",
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z0-9_]*$/,
+                      message:
+                        "Username can only contain letters, numbers, and underscores",
+                    },
                     onChange: (e) => handleUserNameChange(e.target.value),
                   })}
                 />
-                {errors.userName?.message && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.userName.message}
-                  </p>
+                {usernameError && (
+                  <p className="text-sm text-red-600 mt-1">{usernameError}</p>
                 )}
-                {!usernameAvailable && userName && userName.length >= 3 && (
+                {/* Display availability messages */}
+                {!usernameError &&
+                  usernameAvailable &&
+                  userName != userDetails?.userName && (
+                    <p className="text-sm text-green-600 mt-1">
+                      Username is available
+                    </p>
+                  )}
+                {!usernameError && !usernameAvailable && (
                   <p className="text-sm text-red-600 mt-1">
                     Username is not available
-                  </p>
-                )}
-                {usernameAvailable && userName && userName.length >= 3 && (
-                  <p className="text-sm text-green-600 mt-1">
-                    Username is available
                   </p>
                 )}
               </div>
