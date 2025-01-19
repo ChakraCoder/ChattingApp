@@ -20,6 +20,8 @@ const userSlice = createSlice({
       state.firstName = action.payload.firstName;
       state.lastName = action.payload.lastName;
       state.email = action.payload.email;
+      state.userName = action.payload.userName;
+      state.profileImage = action.payload.profileImage;
       state.token = action.payload.token;
     },
     updateUser: (state, action: PayloadAction<UpdateUser>) => {

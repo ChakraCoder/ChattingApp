@@ -39,6 +39,8 @@ export const loginUserService = async ({
       email: true,
       password: true,
       isVerify: true,
+      userName: true,
+      profileImage: true,
     },
   });
 
@@ -65,6 +67,8 @@ export const loginUserService = async ({
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    userName: user.userName,
+    profileImage: user.profileImage,
     token,
   };
 };

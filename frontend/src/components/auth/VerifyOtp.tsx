@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   InputOTP,
   InputOTPGroup,
@@ -16,7 +16,6 @@ import { Loader2 } from "lucide-react";
 import { useAppDispatch } from "@/app/hooks";
 import { setUser } from "@/app/slice/userSlice";
 import setAuthToken from "@/utils/setAuthToken";
-import { isAuthenticated } from "@/utils/isAuthenticated";
 
 const OtpPage = () => {
   const { toast } = useToast();
@@ -30,12 +29,6 @@ const OtpPage = () => {
   // Extract email from query parameters
   const queryParams = new URLSearchParams(location.search);
   const userEmail = queryParams.get("email");
-
-  useEffect(() => {
-    if (isAuthenticated()) {
-      navigate("/profile");
-    }
-  }, [navigate]);
 
   const handleSubmit = async () => {
     try {

@@ -33,7 +33,7 @@ const Login = () => {
       if (userLogin.status === STATUS_CODES.OK) {
         setAuthToken(userLogin.data.data.token)
         dispatch(setUser(userLogin.data.data));
-        navigate("/profile");
+        navigate("/chat");
       }
       setLoading(false);
       reset();

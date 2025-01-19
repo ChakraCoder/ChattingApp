@@ -3,17 +3,8 @@ import Victory from "@/assets/victory.svg";
 import Login from "@/components/auth/Login";
 import Signup from "@/components/auth/Signup";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { isAuthenticated } from "@/utils/isAuthenticated";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (isAuthenticated()) {
-      navigate("/profile");
-    }
-  }, [navigate]);
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-y-auto">
       <div className="bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vh] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2 pb-5">

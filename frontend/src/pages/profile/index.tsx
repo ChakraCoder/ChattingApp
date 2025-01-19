@@ -32,6 +32,9 @@ const Profile = () => {
   const [userName, setUserName] = useState<string | undefined>();
   const [previewImage, setPreviewImage] = useState<string>();
   const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [profileImageError, setProfileImageError] = useState<string | null>(
+    null
+  );
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -123,6 +126,17 @@ const Profile = () => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        setProfileImageError("Only image files are allowed.");
+        return;
+      }
+
+      // Check file size (2MB = 2 * 1024 * 1024 bytes)
+      if (file.size > 2 * 1024 * 1024) {
+        setProfileImageError("File size must be under 2MB.");
+        return;
+      }
+      setProfileImageError(null);
       const reader = new FileReader();
       reader.onload = () => setPreviewImage(reader.result as string);
       reader.readAsDataURL(file);
@@ -133,9 +147,6 @@ const Profile = () => {
   const onSubmit: SubmitHandler<profilePayload> = async (data) => {
     try {
       setLoading(true);
-
-      console.log(data.profileImage);
-
       // Compare userDetails with form data using fast-deep-equal
       if (equal(data, userDetails)) {
         // If no changes, navigate without making an API request
@@ -210,6 +221,9 @@ const Profile = () => {
                   onChange: (e) => handleImageChange(e),
                 })}
               />
+              {profileImageError && (
+                <p className="text-sm text-red-600 mt-1">{profileImageError}</p>
+              )}
               {errors.profileImage?.message && (
                 <p className="text-sm text-red-600 mt-1">
                   {errors.profileImage.message}
@@ -229,7 +243,7 @@ const Profile = () => {
                   placeholder="Username"
                   type="text"
                   autoComplete="off"
-                  className="w-full rounded-xl px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full rounded-xl px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none mt-2"
                   {...register("userName", {
                     required: "Username is required",
                     minLength: {

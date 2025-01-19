@@ -33,6 +33,7 @@ export const registerUserController = async (
 ): Promise<void> => {
   try {
     const { email } = req.body;
+    console.log(req.body);
 
     // Register the user
     await registerUserService(req.body);

@@ -14,6 +14,8 @@ export interface SetUser {
   lastName: string | null;
   email: string | null;
   token: string | null;
+  userName?: string | null;
+  profileImage?: string | null;
 }
 
 export interface UpdateUser {
