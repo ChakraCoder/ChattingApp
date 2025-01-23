@@ -7,7 +7,7 @@ import { useAppSelector } from "@/app/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks";
 import ContactsContainer from "@/components/chat/contact-container";
-import ChatContainer from "@/components/chat/ChatContainer";
+// import ChatContainer from "@/components/chat/ChatContainer";
 // import EmptyChatContainer from "@/components/chat/EmptyChatContainer";
 
 const Chat = () => {
@@ -35,7 +35,7 @@ const Chat = () => {
         <ContactsContainer />
         <ResizableHandle className="border-r-2 border-[#2f303b]" />
         {/* <EmptyChatContainer /> */}
-        <ChatContainer />
+        {/* <ChatContainer /> */}
       </ResizablePanelGroup>
     </div>
   );

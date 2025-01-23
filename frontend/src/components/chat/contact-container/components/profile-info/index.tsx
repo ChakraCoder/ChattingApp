@@ -1,6 +1,5 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useAppSelector } from "@/app/hooks";
-import { FiEdit2 } from "react-icons/fi";
 import {
   BACKEND_DEPLOYED_URL,
   BACKEND_DEVELOPMENT_URL,
@@ -12,8 +11,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
+import { LogOut, Edit } from "lucide-react";
+import useLogout from "@/hooks/use-logout";
 
 const ProfileInfo = () => {
+  const navigate = useNavigate();
+  const logout = useLogout();
   const user = useAppSelector((state) => state.user);
 
   const profileImagePath = user.profileImage
@@ -25,7 +29,7 @@ const ProfileInfo = () => {
     : "/no-profile.jpg";
 
   return (
-    <div className="absolute bottom-0 h-16 flex items-center justify-between px-10 w-full bg-[#2a2b33]">
+    <div className="absolute bottom-0 h-24 flex items-center justify-between px-10 w-full bg-[#2a2b33]">
       <div className="flex gap-3 items-center justify-center">
         <div className="w-12 h-12 relative">
           <Avatar className="h-12 w-12 rounded-full overflow-hidden">
@@ -37,21 +41,39 @@ const ProfileInfo = () => {
           </Avatar>
         </div>
         <div>
-          <p className="text-white">
-            {user.firstName && user.lastName
-              ? `${user.firstName} ${user.lastName}`
-              : ""}
+          <p className="text-white mb-1">
+            {user.firstName &&
+              user.lastName &&
+              `${user.firstName} ${user.lastName}`}
           </p>
+          <p className="text-white">{user.userName && `${user.userName} `}</p>
         </div>
       </div>
       <div className="flex gap-5">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <FiEdit2 className="text-purple-500 text-xl font-medium" />
+              <Edit
+                className="text-purple-500 text-xl font-medium"
+                onClick={() => navigate("/profile")}
+              />
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-[#1c1b1e] border-none text-white">
               <p>Edit Profile</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <LogOut
+                className="text-red-500 text-xl font-medium"
+                onClick={logout}
+              />
+            </TooltipTrigger>
+            <TooltipContent className="bg-[#1c1b1e] border-none text-white">
+              <p>Logout</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
