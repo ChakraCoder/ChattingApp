@@ -113,9 +113,14 @@ const Profile = () => {
       }
       setUsernameAvailable(true);
       setLoading(false);
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       setLoading(false);
       setUsernameAvailable(false);
+      if (error.status === STATUS_CODES.CONFLICT) {
+        setUsernameError(error.response?.data?.error);
+        return;
+      }
       setUsernameError(
         "An error occurred while checking username availability"
       );

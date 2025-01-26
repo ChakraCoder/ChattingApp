@@ -63,7 +63,7 @@ export class UserNameAlreadyExistError extends CustomError {
   constructor() {
     super(
       "UserNameAlreadyExistError",
-      "Username already Exists.",
+      "Username already exists.",
       STATUS_CODES.CONFLICT,
     );
   }

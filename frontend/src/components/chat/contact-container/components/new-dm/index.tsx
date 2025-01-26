@@ -18,12 +18,56 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import Lottie from "react-lottie";
 import { animationDefaultOptions } from "@/utils/utils";
+import { useErrorHandler } from "@/hooks";
+import { contactSearch } from "@/apis/contactsApiServices";
+import { STATUS_CODES } from "@/constants/statusCodes";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { UserState } from "@/types/userTypes";
+import {
+  BACKEND_DEPLOYED_URL,
+  BACKEND_DEVELOPMENT_URL,
+  NODE_ENV,
+} from "@/constants/env";
+import { useAppDispatch } from "@/app/hooks";
+import {
+  setSelectedChatData,
+  setSelectedChatType,
+} from "@/app/slice/chatSlice";
 
 const NewDm = () => {
+  const dispatch = useAppDispatch();
+  const handleError = useErrorHandler();
   const [openNewContactModel, setOpenNewContactModel] = useState(false);
-  const [searchedContacts, setSearchedContacts] = useState([]);
+  const [searchedContacts, setSearchedContacts] = useState<UserState[]>([]);
 
-  const searchContacts = async (search) => {};
+  const searchContacts = async (searchTerm: string) => {
+    try {
+      if (searchTerm.length > 0) {
+        const searchedUsers = await contactSearch(searchTerm);
+
+        if (searchedUsers.status === STATUS_CODES.OK) {
+          setSearchedContacts(searchedUsers.data.data.users);
+        }
+      } else {
+        setSearchedContacts([]);
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  const selectNewContact = (contact: UserState) => {
+    try {
+      setOpenNewContactModel(false);
+      dispatch(setSelectedChatType("contact"));
+      dispatch(setSelectedChatData(contact));
+      setSearchedContacts([]);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
   return (
     <div>
       <TooltipProvider>
@@ -56,6 +100,53 @@ const NewDm = () => {
               onChange={(e) => searchContacts(e.target.value)}
             />
           </div>
+
+          {searchedContacts.length > 0 && (
+            <ScrollArea className="h-[250px] mt-5">
+              <div className="flex flex-col gap-5">
+                {searchedContacts.map((contact: UserState) => {
+                  return (
+                    <div
+                      key={contact.id}
+                      className="flex gap-3 items-center cursor-pointer"
+                      onClick={() => {
+                        selectNewContact(contact);
+                      }}
+                    >
+                      <div className="w-12 h-12 relative">
+                        <Avatar className="h-12 w-12 rounded-full overflow-hidden">
+                          <AvatarImage
+                            src={
+                              contact.profileImage
+                                ? `${
+                                    NODE_ENV === "development"
+                                      ? BACKEND_DEVELOPMENT_URL
+                                      : BACKEND_DEPLOYED_URL
+                                  }/profile-images/${contact.profileImage}`
+                                : "/no-profile.jpg"
+                            }
+                            alt="profile"
+                            className="object-cover w-full h-full bg-black"
+                          />
+                        </Avatar>
+                      </div>
+                      <div>
+                        <p className="text-white mb-1">
+                          {contact.firstName &&
+                            contact.lastName &&
+                            `${contact.firstName} ${contact.lastName}`}
+                        </p>
+                        <p className="text-white">
+                          {contact.userName && `${contact.userName} `}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          )}
+
           {searchedContacts.length <= 0 && (
             <div className="flex-1 md:bg-[#1c1d25] flex flex-col justify-center items-center mt-5 duration-1000 transition-all">
               <Lottie
@@ -66,8 +157,7 @@ const NewDm = () => {
               />
               <div className="text-opacity-80 text-white gap-5 lg:text-2xl text-xl text-center flex flex-col justify-center items-center mt-5 duration-300 transition-all">
                 <h3 className="poppins-medium mt-3">
-                  Hi<span className="text-purple-500">!</span> Search new
-                  <span className="text-purple-500"> Contact.</span>
+                  Search new<span className="text-purple-500"> Contact.</span>
                 </h3>
               </div>
             </div>
