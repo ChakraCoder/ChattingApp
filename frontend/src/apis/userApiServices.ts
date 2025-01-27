@@ -33,7 +33,7 @@ userApiService.interceptors.response.use(
     // Check for 401 Unauthorized error (invalid token)
     if (error.response && error.response.status === STATUS_CODES.UNAUTHORIZED) {
       // Handle token invalidation here
-      console.log("Token is invalid or expired");
+      console.error("Token is invalid or expired");
 
       // Option 1: Redirect to login page
       window.location.href = "/auth";

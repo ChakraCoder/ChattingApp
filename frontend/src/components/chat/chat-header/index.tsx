@@ -31,7 +31,7 @@ const ChatHeader = () => {
             <Avatar className="h-12 w-12 rounded-full overflow-hidden">
               <AvatarImage
                 src={
-                  selectedChatData.profileImage
+                  selectedChatData.profileImage !== null
                     ? `${
                         NODE_ENV === "development"
                           ? BACKEND_DEVELOPMENT_URL

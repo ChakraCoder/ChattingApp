@@ -5,12 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { RiEmojiStickerLine } from "react-icons/ri";
 import EmojiPicker from "emoji-picker-react";
+import { useAppSelector } from "@/app/hooks";
+import { useErrorHandler } from "@/hooks";
+import { useSocket } from "@/socket/useSocket";
 
 const MessageBar = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const emojiRef = useRef<any>();
   const [message, setMessage] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const { selectedChatDetails } = useAppSelector((state) => state.chat);
+  const userInfo = useAppSelector((state) => state.user);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const socket: any = useSocket();
+  const handleError = useErrorHandler();
 
   useEffect(() => {
     function handleClickOutside(event: Event) {
@@ -27,7 +35,27 @@ const MessageBar = () => {
   const handleAddEmoji = (emoji: { emoji: string }) => {
     setMessage((msg) => msg + emoji.emoji);
   };
-  const handleSendMessage = async () => {};
+  const handleSendMessage = async () => {
+    try {
+      if (
+        message.trim() !== "" &&
+        selectedChatDetails?.chatType === "INDIVIDUAL" &&
+        socket
+      ) {
+        socket.emit("sendMessage", {
+          senderId: userInfo.id,
+          chatId: selectedChatDetails.id,
+          content: message,
+          type: "TEXT",
+          mediaUrl: undefined,
+          fileName: undefined,
+        });
+        setMessage("");
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  };
   return (
     <div className="h-[12vh] bg-[#1c1d25]  p-4 flex flex-row">
       <ChatInput

@@ -1,5 +1,6 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ResizablePanel } from "../../ui/resizable";
+import IndividualChat from "./components/IndividualChat";
 import NewDm from "./components/new-dm";
 import ProfileInfo from "./components/profile-info";
 
@@ -17,13 +18,16 @@ const ContactsContainer = () => {
         </div>
         <div className="my-5">
           <div className="flex items-center justify-between pr-10">
-            <Title text="Direct Messages" />
+            <Title text="Chats" />
             <NewDm />
+          </div>
+          <div className="max-h-[38vh] overflow-y-auto scrollbar-hidden">
+            <IndividualChat />
           </div>
         </div>
         <div className="my-5">
           <div className="flex items-center justify-between pr-10">
-            <Title text="Channels" />
+            <Title text="Group Chats" />
           </div>
           <ProfileInfo />
         </div>

@@ -1,15 +1,19 @@
 import { getBaseURL } from ".";
 import axios, { AxiosInstance } from "axios";
 import { STATUS_CODES } from "@/constants/statusCodes";
+import {
+  addGroupChatPayload,
+  addIndividualChatPayload,
+} from "@/types/chatTypes";
 
 // Create the Axios instance
-const contactsApiService: AxiosInstance = axios.create({
-  baseURL: `${getBaseURL()}/api/contacts/`,
+const chatApiService: AxiosInstance = axios.create({
+  baseURL: `${getBaseURL()}/api/chat/`,
   timeout: 10000,
 });
 
 // Request interceptor to include auth token in specific requests
-contactsApiService.interceptors.request.use(
+chatApiService.interceptors.request.use(
   (config) => {
     const authToken = localStorage.getItem("auth_token");
 
@@ -24,7 +28,7 @@ contactsApiService.interceptors.request.use(
   }
 );
 
-contactsApiService.interceptors.response.use(
+chatApiService.interceptors.response.use(
   (response) => {
     // Successful response, just return it
     return response;
@@ -48,6 +52,18 @@ contactsApiService.interceptors.response.use(
   }
 );
 
-export const contactSearch = async (searchTerm: string) => {
-  return await contactsApiService.post(`search`, { searchTerm });
+export const addIndividualChat = async (
+  addIndividualChatPayload: addIndividualChatPayload
+) => {
+  return await chatApiService.post(`individual-chat`, addIndividualChatPayload);
+};
+
+export const addGroupChat = async (
+  addGroupChatPayload: addGroupChatPayload
+) => {
+  return await chatApiService.post(`group-chat`, addGroupChatPayload);
+};
+
+export const getAllUserChats = async () => {
+  return await chatApiService.get("");
 };

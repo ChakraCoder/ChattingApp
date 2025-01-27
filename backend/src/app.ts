@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 import cors from "cors";
 import morgan from "morgan";
-import { authRoutes, contactsRoutes, userRoutes } from "./routes";
+import { authRoutes, chatRoutes, contactsRoutes, userRoutes } from "./routes";
 import { errorHandler } from "./middlewares/errorMiddleware";
 import path from "path";
 import {
@@ -29,6 +29,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/contacts", contactsRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Error handling
 app.use(errorHandler);

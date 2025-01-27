@@ -29,13 +29,16 @@ import {
   BACKEND_DEVELOPMENT_URL,
   NODE_ENV,
 } from "@/constants/env";
-import { useAppDispatch } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
+  selectedChatDetails,
   setSelectedChatData,
-  setSelectedChatType,
 } from "@/app/slice/chatSlice";
+import { addIndividualChat } from "@/apis/chatApiServices";
 
 const NewDm = () => {
+  const userId = useAppSelector((state) => state.user.id);
+  const { allExistingChatsData } = useAppSelector((state) => state.chat);
   const dispatch = useAppDispatch();
   const handleError = useErrorHandler();
   const [openNewContactModel, setOpenNewContactModel] = useState(false);
@@ -57,12 +60,53 @@ const NewDm = () => {
     }
   };
 
-  const selectNewContact = (contact: UserState) => {
+  const selectNewContact = async (contact: UserState) => {
     try {
       setOpenNewContactModel(false);
-      dispatch(setSelectedChatType("contact"));
       dispatch(setSelectedChatData(contact));
       setSearchedContacts([]);
+
+      const existingChat = allExistingChatsData.find(
+        (chat) =>
+          !chat.isGroupChat && 
+          chat.participants.some((participant) => participant.id === contact.id)
+      );
+
+      if (existingChat) {
+        const { id, groupName, isGroupChat, createdAt, updatedAt } =
+          existingChat;
+        dispatch(
+          selectedChatDetails({
+            id,
+            groupName,
+            chatType: isGroupChat === true ? "GROUP" : "INDIVIDUAL",
+            createdAt,
+            updatedAt,
+          })
+        );
+      } else {
+        // Ensure that contact.id and userId are not null
+        if (contact.id && userId) {
+          const IndividualChatAdd = await addIndividualChat({
+            isGroupChat: false,
+            participants: [contact.id, userId],
+          });
+
+          const { id, groupName, isGroupChat, createdAt, updatedAt } =
+            IndividualChatAdd.data.data.chat;
+          dispatch(
+            selectedChatDetails({
+              id,
+              groupName,
+              chatType: isGroupChat === true ? "GROUP" : "INDIVIDUAL",
+              createdAt,
+              updatedAt,
+            })
+          );
+        } else {
+          throw new Error("User ID or contact ID is null");
+        }
+      }
     } catch (error) {
       handleError(error);
     }
