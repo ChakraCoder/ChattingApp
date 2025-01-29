@@ -70,8 +70,6 @@ export const addGroupChatService = async ({
 };
 
 export const getAllChatService = async (userId: string) => {
-  console.log("userId", userId);
-
   // Fetch all chats where the user is a participant
   const chats = await prisma.chat.findMany({
     where: {

@@ -8,10 +8,14 @@ import EmojiPicker from "emoji-picker-react";
 import { useAppSelector } from "@/app/hooks";
 import { useErrorHandler } from "@/hooks";
 import { useSocket } from "@/socket/useSocket";
+import { uploadMessageFile } from "@/apis/messageApiService";
+import { STATUS_CODES } from "@/constants/statusCodes";
 
 const MessageBar = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const emojiRef = useRef<any>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fileInputRef = useRef<any>();
   const [message, setMessage] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const { selectedChatDetails } = useAppSelector((state) => state.chat);
@@ -47,8 +51,8 @@ const MessageBar = () => {
           chatId: selectedChatDetails.id,
           content: message,
           type: "TEXT",
-          mediaUrl: undefined,
-          fileName: undefined,
+          mediaUrl: null,
+          fileName: null,
         });
         setMessage("");
       }
@@ -56,6 +60,42 @@ const MessageBar = () => {
       handleError(error);
     }
   };
+
+  const handleAttachmentClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleAttachmentChange = async (e: any) => {
+    try {
+      const file = e.target.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const sendFileMessage = await uploadMessageFile(formData);
+        const { fileName, mediaUrl, type } =
+          sendFileMessage.data.data.uploadFile;
+
+        if (sendFileMessage.status === STATUS_CODES.OK) {
+          if (selectedChatDetails?.chatType === "INDIVIDUAL") {
+            socket.emit("sendMessage", {
+              senderId: userInfo.id,
+              chatId: selectedChatDetails.id,
+              content: undefined,
+              type,
+              mediaUrl,
+              fileName,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
   return (
     <div className="h-[12vh] bg-[#1c1d25]  p-4 flex flex-row">
       <ChatInput
@@ -91,9 +131,16 @@ const MessageBar = () => {
         variant="outline"
         size="icon"
         className="size-12 border-none rounded-none bg-[#2a2b33] text-white"
+        onClick={handleAttachmentClick}
       >
         <GrAttachment className="text-2xl " />
       </Button>
+      <input
+        type="file"
+        className="hidden"
+        ref={fileInputRef}
+        onChange={handleAttachmentChange}
+      />
       <div className="ml-2">
         <Button
           variant="outline"

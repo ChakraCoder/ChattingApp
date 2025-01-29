@@ -74,42 +74,153 @@ const MessageContainer = () => {
     const messageTime = moment(message.updatedAt).format("LT");
 
     return (
-      message.type === "TEXT" && (
-        <ChatMessageList>
-          <ChatBubble
-            variant={message.senderId === userInfo.id ? "sent" : "received"}
-          >
-            <ChatBubbleAvatar
-              src={
-                message.sender.profileImage !== null
-                  ? `${
-                      NODE_ENV === "development"
-                        ? BACKEND_DEVELOPMENT_URL
-                        : BACKEND_DEPLOYED_URL
-                    }/${message.sender.profileImage}`
-                  : "/no-profile.jpg"
-              }
-            />
-            <ChatBubbleMessage
-              variant={message.senderId == userInfo.id ? "sent" : "received"}
+      <>
+        {/* TEXT MESSAGE */}
+        {message.type === "TEXT" && (
+          <ChatMessageList>
+            <ChatBubble
+              variant={message.senderId === userInfo.id ? "sent" : "received"}
             >
-              <div className="flex flex-col">
-                {selectedChatDetails?.chatType === "GROUP" && (
-                  <div className="flex justify-start pb-3">
+              <ChatBubbleAvatar
+                src={
+                  message.sender.profileImage !== null
+                    ? `${
+                        NODE_ENV === "development"
+                          ? BACKEND_DEVELOPMENT_URL
+                          : BACKEND_DEPLOYED_URL
+                      }/${message.sender.profileImage}`
+                    : "/no-profile.jpg"
+                }
+              />
+              <ChatBubbleMessage
+                variant={message.senderId === userInfo.id ? "sent" : "received"}
+              >
+                <div className="flex flex-col">
+                  {selectedChatDetails?.chatType === "GROUP" && (
+                    <div className="flex justify-start pb-3">
+                      <div className="text-xs text-neutral-400">
+                        {`~ ` + message.sender.userName}
+                      </div>
+                    </div>
+                  )}
+                  <div className="text-base">{message.content}</div>
+                  <div className="flex justify-end pt-1">
                     <div className="text-xs text-neutral-400">
-                      {`~ ` + message.sender.userName}
+                      {messageTime}
                     </div>
                   </div>
-                )}
-                <div className="text-base">{message.content}</div>
-                <div className="flex justify-end pt-1">
-                  <div className="text-xs text-neutral-400">{messageTime}</div>
                 </div>
-              </div>
-            </ChatBubbleMessage>
-          </ChatBubble>
-        </ChatMessageList>
-      )
+              </ChatBubbleMessage>
+            </ChatBubble>
+          </ChatMessageList>
+        )}
+
+        {/* IMAGE MESSAGE */}
+        {message.type === "IMAGE" && (
+          <ChatMessageList>
+            <ChatBubble
+              variant={message.senderId === userInfo.id ? "sent" : "received"}
+            >
+              <ChatBubbleAvatar
+                src={
+                  message.sender.profileImage !== null
+                    ? `${
+                        NODE_ENV === "development"
+                          ? BACKEND_DEVELOPMENT_URL
+                          : BACKEND_DEPLOYED_URL
+                      }/${message.sender.profileImage}`
+                    : "/no-profile.jpg"
+                }
+              />
+              <ChatBubbleMessage
+                variant={message.senderId === userInfo.id ? "sent" : "received"}
+              >
+                <div className="flex flex-col">
+                  {selectedChatDetails?.chatType === "GROUP" && (
+                    <div className="flex justify-start pb-3">
+                      <div className="text-xs text-neutral-400">
+                        {`~ ` + message.sender.userName}
+                      </div>
+                    </div>
+                  )}
+                  {/* Display Image */}
+                  <div className="flex justify-center">
+                    <img
+                      src={`${
+                        NODE_ENV === "development"
+                          ? BACKEND_DEVELOPMENT_URL
+                          : BACKEND_DEPLOYED_URL
+                      }/${message.fileName}`}
+                      alt="Sent Image"
+                      className="max-w-[200px] max-h-[200px] rounded-lg border"
+                    />
+                  </div>
+                  <div className="flex justify-end pt-1">
+                    <div className="text-xs text-neutral-400">
+                      {messageTime}
+                    </div>
+                  </div>
+                </div>
+              </ChatBubbleMessage>
+            </ChatBubble>
+          </ChatMessageList>
+        )}
+
+        {/* FILE MESSAGE */}
+        {message.type === "FILE" && (
+          <ChatMessageList>
+            <ChatBubble
+              variant={message.senderId === userInfo.id ? "sent" : "received"}
+            >
+              <ChatBubbleAvatar
+                src={
+                  message.sender.profileImage !== null
+                    ? `${
+                        NODE_ENV === "development"
+                          ? BACKEND_DEVELOPMENT_URL
+                          : BACKEND_DEPLOYED_URL
+                      }/${message.sender.profileImage}`
+                    : "/no-profile.jpg"
+                }
+              />
+              <ChatBubbleMessage
+                variant={message.senderId === userInfo.id ? "sent" : "received"}
+              >
+                <div className="flex flex-col">
+                  {selectedChatDetails?.chatType === "GROUP" && (
+                    <div className="flex justify-start pb-3">
+                      <div className="text-xs text-neutral-400">
+                        {`~ ` + message.sender.userName}
+                      </div>
+                    </div>
+                  )}
+                  {/* Display File Link */}
+                  <div className="flex items-center gap-2 border p-2 rounded-lg">
+                    <span className="text-sm">{message.fileName}</span>
+                    <a
+                      href={`${
+                        NODE_ENV === "development"
+                          ? BACKEND_DEVELOPMENT_URL
+                          : BACKEND_DEPLOYED_URL
+                      }/${message.fileName}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      Download
+                    </a>
+                  </div>
+                  <div className="flex justify-end pt-1">
+                    <div className="text-xs text-neutral-400">
+                      {messageTime}
+                    </div>
+                  </div>
+                </div>
+              </ChatBubbleMessage>
+            </ChatBubble>
+          </ChatMessageList>
+        )}
+      </>
     );
   };
 

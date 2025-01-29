@@ -9,6 +9,7 @@ import ProtectedRoutes from "./components/routes/ProtectedRoutes";
 import AuthRoutes from "./components/routes/AuthRoutes";
 import NotFound from "./pages/auth/NotFound";
 
+
 function App() {
   return (
     <>
