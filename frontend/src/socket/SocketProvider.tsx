@@ -8,7 +8,7 @@ import {
   NODE_ENV,
 } from "@/constants/env";
 import { Message } from "@/types/chatTypes";
-import { SocketContext } from "./useSocket"; // Import the SocketContext
+import { SocketContext } from "./useSocket";
 
 interface SocketProviderProps {
   children: React.ReactNode;

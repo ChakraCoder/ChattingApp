@@ -25,7 +25,7 @@ const ProfileInfo = () => {
         NODE_ENV === "development"
           ? BACKEND_DEVELOPMENT_URL
           : BACKEND_DEPLOYED_URL
-      }/profile-images/${user.profileImage}`
+      }/${user.profileImage}`
     : "/no-profile.jpg";
 
   return (

@@ -68,7 +68,7 @@ const NewDm = () => {
 
       const existingChat = allExistingChatsData.find(
         (chat) =>
-          !chat.isGroupChat && 
+          !chat.isGroupChat &&
           chat.participants.some((participant) => participant.id === contact.id)
       );
 
@@ -166,7 +166,7 @@ const NewDm = () => {
                                     NODE_ENV === "development"
                                       ? BACKEND_DEVELOPMENT_URL
                                       : BACKEND_DEPLOYED_URL
-                                  }/profile-images/${contact.profileImage}`
+                                  }/${contact.profileImage}`
                                 : "/no-profile.jpg"
                             }
                             alt="profile"

@@ -8,23 +8,30 @@ export const addIndividualChatService = async ({
   isGroupChat: boolean;
   participants: string[];
 }) => {
-  // Check if a chat already exists with the same participants
+  const participantCount = participants.length;
+
   const existingChat = await prisma.chat.findFirst({
     where: {
       isGroupChat: false,
       participants: {
-        some: {
+        every: {
           userId: {
             in: participants,
           },
         },
       },
     },
+    include: {
+      participants: true,
+    },
   });
 
-  if (existingChat) {
+  // If an existing chat is found and the number of participants matches, throw an error
+  if (existingChat && existingChat.participants.length === participantCount) {
     throw new IndividualChatCreatedError();
   }
+
+  // Otherwise, create a new chat
   const chat = await prisma.chat.create({
     data: {
       isGroupChat,
@@ -35,6 +42,7 @@ export const addIndividualChatService = async ({
       },
     },
   });
+
   return chat;
 };
 
@@ -61,7 +69,9 @@ export const addGroupChatService = async ({
   return chat;
 };
 
-export const getAllChatService = async ({ userId }: { userId: string }) => {
+export const getAllChatService = async (userId: string) => {
+  console.log("userId", userId);
+
   // Fetch all chats where the user is a participant
   const chats = await prisma.chat.findMany({
     where: {

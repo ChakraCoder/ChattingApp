@@ -1,3 +1,5 @@
+import { UserState } from "./userTypes";
+
 export interface addIndividualChatPayload {
   isGroupChat: boolean;
   participants: string[];
@@ -16,6 +18,10 @@ export type Message = {
   content: string;
   type: "TEXT" | "IMAGE" | "FILE";
   fileName: string;
+  sender:{
+    userName:string,
+    profileImage:string
+  }
   mediaUrl: string;
   createdAt: string;
   updatedAt: string;
@@ -23,7 +29,7 @@ export type Message = {
 
 export type Chat = {
   id: string;
-  groupName?: string; 
+  groupName?: string;
   chatType: "GROUP" | "INDIVIDUAL";
   createdAt: string;
   updatedAt: string;
@@ -50,10 +56,16 @@ export type LatestMessage = {
 export type ChatDetails = {
   id: string;
   isGroupChat: boolean;
-  groupName: string ;
+  groupName: string;
   createdAt: string;
   updatedAt: string;
   participants: Participant[];
   latestMessage: LatestMessage | null;
 };
 
+export interface ChatState {
+  selectedChatDetails: Chat | null;
+  selectedChatData: UserState | null;
+  selectedChatMessages: Message[] | [];
+  allExistingChatsData: ChatDetails[] | [];
+}

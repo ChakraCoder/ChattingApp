@@ -10,7 +10,7 @@ import {
   BACKEND_DEVELOPMENT_URL,
   NODE_ENV,
 } from "@/constants/env";
-import { ChatDetails, LatestMessage } from "@/types/chatTypes";
+import { ChatDetails } from "@/types/chatTypes";
 import { Avatar } from "@radix-ui/react-avatar";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -49,10 +49,10 @@ const IndividualChat = () => {
     };
 
     fetchChats();
-  }, [allExistingChatsData, userId]);
+  }, [allExistingChatsData, userId, selectedChatDetails]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleClick = (chat: { id: any; isGroupChat?: boolean; groupName?: any; createdAt?: any; updatedAt?: any; participants?: any; latestMessage?: LatestMessage | null; }) => {
+  // @ts-expect-error chat type
+  const handleClick = (chat) => {
     if (selectedChatDetails?.id === chat.id) {
       setSelectedChatMessages([]);
     }
@@ -77,12 +77,12 @@ const IndividualChat = () => {
             key={chat.id}
             className={`pl-10 py-2 transition-all duration-300 cursor-pointer ${
               selectedChatDetails?.id === chat.id
-                ? "bg-[#8417fs] hover:bg-[8417ff]"
+                ? "bg-[#f1f1f111]"
                 : "hover:bg-[#f1f1f111]"
             }`}
             onClick={() => handleClick(chat)}
           >
-            <div className="flex gap-5 items-center justify-start text-neutral-300">
+            <div className="flex gap-5 items-center justify-start text-neutral-300 ">
               <div className="w-12 h-12 relative">
                 <Avatar className="h-12 w-12 rounded-full overflow-hidden">
                   <AvatarImage
@@ -92,7 +92,7 @@ const IndividualChat = () => {
                             NODE_ENV === "development"
                               ? BACKEND_DEVELOPMENT_URL
                               : BACKEND_DEPLOYED_URL
-                          }/profile-images/${chat.participants[0].profileImage}`
+                          }/${chat.participants[0].profileImage}`
                         : "/no-profile.jpg"
                     }
                     alt="profile"
@@ -101,14 +101,12 @@ const IndividualChat = () => {
                 </Avatar>
               </div>
               <div>
-                <p className="text-white mb-1">
-                  {chat.participants[0].firstName &&
-                    chat.participants[0].lastName &&
-                    `${chat.participants[0].firstName} ${chat.participants[0].lastName}`}
-                </p>
-                <p className="text-white">
+                <p className="text-white text-base">
                   {chat.participants[0].userName &&
                     `${chat.participants[0].userName} `}
+                </p>
+                <p className="text-gray-400 my-1 text-sm">
+                  {chat.latestMessage && `${chat.latestMessage.content} `}
                 </p>
               </div>
             </div>

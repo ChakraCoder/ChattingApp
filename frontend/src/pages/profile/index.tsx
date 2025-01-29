@@ -58,7 +58,7 @@ const Profile = () => {
             NODE_ENV === "development"
               ? BACKEND_DEVELOPMENT_URL
               : BACKEND_DEPLOYED_URL
-          }/profile-images/${userDetailsResponse.data.data.profileImage}`
+          }/${userDetailsResponse.data.data.profileImage}`
         );
       }
       dispatch(

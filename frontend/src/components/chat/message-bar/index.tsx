@@ -63,6 +63,12 @@ const MessageBar = () => {
         placeholder="Type a message..."
         className="focus:border-none border-none bg-[#2a2b33] text-white rounded-none"
         onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+          }
+        }}
       />
       <Button
         variant="outline"

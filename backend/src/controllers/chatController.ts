@@ -51,7 +51,8 @@ export const getAllChatController = async (
 ): Promise<void> => {
   try {
     // @ts-expect-error req.user.id
-    const chat = await getAllChatService(req.user.id);
+    const userId = req.user.id;
+    const chat = await getAllChatService(userId);
 
     res.status(STATUS_CODES.OK).json({
       success: true,

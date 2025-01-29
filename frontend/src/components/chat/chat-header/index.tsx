@@ -36,7 +36,7 @@ const ChatHeader = () => {
                         NODE_ENV === "development"
                           ? BACKEND_DEVELOPMENT_URL
                           : BACKEND_DEPLOYED_URL
-                      }/profile-images/${selectedChatData.profileImage}`
+                      }/${selectedChatData.profileImage}`
                     : "/no-profile.jpg"
                 }
                 alt="profile"

@@ -1,14 +1,8 @@
-import { Chat, ChatDetails, Message } from "@/types/chatTypes";
+import { Chat, ChatDetails, ChatState, Message } from "@/types/chatTypes";
 import { UserState } from "@/types/userTypes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Define the state type
-interface ChatState {
-  selectedChatDetails: Chat | null;
-  selectedChatData: UserState | null;
-  selectedChatMessages: Message[] ;
-  allExistingChatsData: ChatDetails[];
-}
 
 const initialState: ChatState = {
   selectedChatData: null,
@@ -44,6 +38,12 @@ const chatSlice = createSlice({
         action.payload,
       ];
     },
+    clearChat: (state) => {
+      state.selectedChatDetails = null;
+      state.selectedChatData = null;
+      state.selectedChatMessages = [];
+      state.allExistingChatsData = [];
+    },
   },
 });
 
@@ -55,5 +55,6 @@ export const {
   setAllExistingChatsData,
   closeChat,
   addMessage,
+  clearChat
 } = chatSlice.actions;
 export default chatSlice.reducer;

@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/app/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
   ChatBubble,
   ChatBubbleAvatar,
@@ -14,17 +14,38 @@ import {
   NODE_ENV,
 } from "@/constants/env";
 import { useEffect } from "react";
+import { useErrorHandler } from "@/hooks";
+import { setSelectedChatMessages } from "@/app/slice/chatSlice";
+import { getChatMessages } from "@/apis/messageApiService";
 
 const MessageContainer = () => {
   const { scrollRef, scrollToBottom, disableAutoScroll } = useAutoScroll();
-  const { selectedChatMessages, selectedChatData, selectedChatDetails } =
-    useAppSelector((state) => state.chat);
+  const { selectedChatMessages, selectedChatDetails } = useAppSelector(
+    (state) => state.chat
+  );
+  const dispatch = useAppDispatch();
   const userInfo = useAppSelector((state) => state.user);
+  const handleError = useErrorHandler();
 
   // Trigger scroll when new messages arrive
   useEffect(() => {
+    const fetchChatMessages = async () => {
+      try {
+        if (selectedChatDetails) {
+          const messages = await getChatMessages(selectedChatDetails.id);
+          dispatch(setSelectedChatMessages(messages.data.data.chatMessage));
+        }
+      } catch (error) {
+        handleError(error);
+      }
+    };
+    fetchChatMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChatDetails]);
+
+  useEffect(() => {
     scrollToBottom();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChatMessages]);
 
   const renderMessages = () => {
@@ -56,29 +77,36 @@ const MessageContainer = () => {
       message.type === "TEXT" && (
         <ChatMessageList>
           <ChatBubble
-            variant={
-              message.senderId !== selectedChatData?.id ? "sent" : "received"
-            }
+            variant={message.senderId === userInfo.id ? "sent" : "received"}
           >
             <ChatBubbleAvatar
-              src={`${
-                NODE_ENV === "development"
-                  ? BACKEND_DEVELOPMENT_URL
-                  : BACKEND_DEPLOYED_URL
-              }/profile-images/${
-                message.senderId !== selectedChatData?.id
-                  ? userInfo.profileImage || "no-profile.jpg"
-                  : selectedChatData?.profileImage || "no-profile.jpg"
-              }`}
+              src={
+                message.sender.profileImage !== null
+                  ? `${
+                      NODE_ENV === "development"
+                        ? BACKEND_DEVELOPMENT_URL
+                        : BACKEND_DEPLOYED_URL
+                    }/${message.sender.profileImage}`
+                  : "/no-profile.jpg"
+              }
             />
             <ChatBubbleMessage
-              variant={
-                message.senderId !== selectedChatData?.id ? "sent" : "received"
-              }
+              variant={message.senderId == userInfo.id ? "sent" : "received"}
             >
-              {message.content}
+              <div className="flex flex-col">
+                {selectedChatDetails?.chatType === "GROUP" && (
+                  <div className="flex justify-start pb-3">
+                    <div className="text-xs text-neutral-400">
+                      {`~ ` + message.sender.userName}
+                    </div>
+                  </div>
+                )}
+                <div className="text-base">{message.content}</div>
+                <div className="flex justify-end pt-1">
+                  <div className="text-xs text-neutral-400">{messageTime}</div>
+                </div>
+              </div>
             </ChatBubbleMessage>
-            <div className="text-xs text-white">{messageTime}</div>
           </ChatBubble>
         </ChatMessageList>
       )

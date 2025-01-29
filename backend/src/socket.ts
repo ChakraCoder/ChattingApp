@@ -66,21 +66,21 @@ const setupSocket = (server: Server) => {
       // Create the message
       const createdMessage = await prisma.message.create({
         data: { senderId, chatId, content, type, mediaUrl, fileName },
+        include: {
+          sender: {
+            select: {
+              userName: true,
+              profileImage: true,
+            },
+          },
+        },
       });
 
       // Emit the message to all chat participants
       chat.participants.forEach((participant) => {
         const recipientSocketId = userSocketMap.get(participant.userId);
         if (recipientSocketId) {
-          io.to(recipientSocketId).emit("newMessage", {
-            id: createdMessage.id,
-            senderId: createdMessage.senderId,
-            chatId: createdMessage.chatId,
-            content: createdMessage.content,
-            type: createdMessage.type,
-            createdAt: createdMessage.createdAt,
-            updatedAt: createdMessage.updatedAt,
-          });
+          io.to(recipientSocketId).emit("newMessage", createdMessage);
         }
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
