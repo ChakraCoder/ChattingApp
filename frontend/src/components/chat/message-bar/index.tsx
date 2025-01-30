@@ -90,6 +90,7 @@ const MessageBar = () => {
             });
           }
         }
+        e.target.value = "";
       }
     } catch (error) {
       handleError(error);

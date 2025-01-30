@@ -1,4 +1,10 @@
-import { Chat, ChatDetails, ChatState, Message } from "@/types/chatTypes";
+import {
+  Chat,
+  ChatDetails,
+  ChatState,
+  LatestMessage,
+  Message,
+} from "@/types/chatTypes";
 import { UserState } from "@/types/userTypes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -17,6 +23,16 @@ const chatSlice = createSlice({
   reducers: {
     setAllExistingChatsData: (state, action: PayloadAction<ChatDetails[]>) => {
       state.allExistingChatsData = action.payload;
+    },
+    updateLatestMessageOfExistingChat: (
+      state,
+      action: PayloadAction<{ latestMessage: LatestMessage; chatId: string }>
+    ) => {
+      state.allExistingChatsData.filter((chat) => {
+        if (chat.id === action.payload.chatId) {
+          chat.latestMessage = action.payload.latestMessage;
+        }
+      });
     },
     setSelectedChatData: (state, action: PayloadAction<UserState | null>) => {
       state.selectedChatData = action.payload;
@@ -53,8 +69,9 @@ export const {
   selectedChatDetails,
   setSelectedChatMessages,
   setAllExistingChatsData,
+  updateLatestMessageOfExistingChat,
   closeChat,
   addMessage,
-  clearChat
+  clearChat,
 } = chatSlice.actions;
 export default chatSlice.reducer;

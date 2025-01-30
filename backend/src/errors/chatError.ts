@@ -10,3 +10,13 @@ export class IndividualChatCreatedError extends CustomError {
     );
   }
 }
+
+export class FileSizeIsTooLarge extends CustomError {
+  constructor() {
+    super(
+      "FileSizeIsTooLarge",
+      "File is too large. Max size is 10MB.",
+      STATUS_CODES.BAD_REQUEST,
+    );
+  }
+}

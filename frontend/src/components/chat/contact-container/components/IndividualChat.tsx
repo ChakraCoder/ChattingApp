@@ -12,6 +12,7 @@ import {
 } from "@/constants/env";
 import { ChatDetails } from "@/types/chatTypes";
 import { Avatar } from "@radix-ui/react-avatar";
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -32,7 +33,7 @@ const IndividualChat = () => {
       // Filter participants where id is not equal to userId
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const updatedChats: any = filteredChats
-        .map((chat) => {
+        .map((chat: ChatDetails) => {
           const participant = chat.participants.find(
             (participant) => participant.id !== userId
           );
@@ -100,13 +101,27 @@ const IndividualChat = () => {
                   />
                 </Avatar>
               </div>
-              <div>
-                <p className="text-white text-base">
-                  {chat.participants[0].userName &&
-                    `${chat.participants[0].userName} `}
-                </p>
+              <div className="flex flex-col w-full">
+                <div className="flex flex-row">
+                  <p className="text-white text-base">
+                    {chat.participants[0].userName &&
+                      `${chat.participants[0].userName} `}
+                  </p>
+                  <div className="flex w-full px-4 justify-end items-end">
+                    <p className="text-gray-400 my-1 text-sm">
+                      {moment(chat.latestMessage?.timestamp).format("LT")}
+                    </p>
+                  </div>
+                </div>
                 <p className="text-gray-400 my-1 text-sm">
-                  {chat.latestMessage && `${chat.latestMessage.content} `}
+                  {(() => {
+                    const message = chat.latestMessage;
+                    const content = message?.content || message?.fileName;
+                    if (content && content?.length > 30) {
+                      return `${content.slice(0, 28)}...`;
+                    }
+                    return content;
+                  })()}
                 </p>
               </div>
             </div>

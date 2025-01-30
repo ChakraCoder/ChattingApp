@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { addMessage } from "@/app/slice/chatSlice";
+import {
+  addMessage,
+  updateLatestMessageOfExistingChat,
+} from "@/app/slice/chatSlice";
 import {
   BACKEND_DEPLOYED_URL,
   BACKEND_DEVELOPMENT_URL,
@@ -38,6 +41,22 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       socket.current.on("newMessage", (message: Message) => {
+        console.log("newMessage", message);
+        dispatch(
+          updateLatestMessageOfExistingChat({
+            chatId: message.chatId,
+            latestMessage: {
+              id: message.id,
+              type: message.type,
+              content: message.content,
+              mediaUrl: message.mediaUrl,
+              fileName: message.fileName,
+              timestamp: message.updatedAt,
+              senderId: message.senderId,
+            },
+          })
+        );
+
         if (
           selectedChatRef.current &&
           selectedChatRef.current.id === message.chatId

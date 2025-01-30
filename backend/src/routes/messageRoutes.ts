@@ -5,7 +5,7 @@ import {
   getChatMessagesController,
   uploadFileController,
 } from "../controllers/messageController";
-import { fileUpload } from "../utils/uploadFileMulter";
+import { fileUploadMiddleware } from "../utils/uploadFileMulter";
 import { getChatMessagesSchema } from "../schemas/messsageSchema";
 
 const messagRouter = Router();
@@ -20,7 +20,7 @@ messagRouter.post(
 messagRouter.post(
   "/upload-file",
   authenticate,
-  fileUpload.single("file"),
+  fileUploadMiddleware,
   uploadFileController,
 );
 export default messagRouter;

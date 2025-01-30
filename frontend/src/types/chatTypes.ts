@@ -18,10 +18,11 @@ export type Message = {
   content: string;
   type: "TEXT" | "IMAGE" | "FILE";
   fileName: string;
-  sender:{
-    userName:string,
-    profileImage:string
-  }
+  sender: {
+    userName: string;
+    profileImage: string;
+  };
+  chat: Chat;
   mediaUrl: string;
   createdAt: string;
   updatedAt: string;

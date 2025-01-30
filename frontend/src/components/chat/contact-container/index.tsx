@@ -1,5 +1,6 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ResizablePanel } from "../../ui/resizable";
+import CreateGroup from "./components/create-group";
 import IndividualChat from "./components/IndividualChat";
 import NewDm from "./components/new-dm";
 import ProfileInfo from "./components/profile-info";
@@ -28,6 +29,7 @@ const ContactsContainer = () => {
         <div className="my-5">
           <div className="flex items-center justify-between pr-10">
             <Title text="Group Chats" />
+            <CreateGroup />
           </div>
           <ProfileInfo />
         </div>

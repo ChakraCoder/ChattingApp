@@ -17,6 +17,10 @@ import { useEffect } from "react";
 import { useErrorHandler } from "@/hooks";
 import { setSelectedChatMessages } from "@/app/slice/chatSlice";
 import { getChatMessages } from "@/apis/messageApiService";
+import { cleanFileName } from "@/utils/utils";
+import { Download } from "lucide-react";
+import { getFileTypeIcon } from "@/utils/getFileTypeIcon";
+import { handleDownload } from "@/utils/handleDownload";
 
 const MessageContainer = () => {
   const { scrollRef, scrollToBottom, disableAutoScroll } = useAutoScroll();
@@ -144,16 +148,35 @@ const MessageContainer = () => {
                     </div>
                   )}
                   {/* Display Image */}
-                  <div className="flex justify-center">
-                    <img
-                      src={`${
-                        NODE_ENV === "development"
-                          ? BACKEND_DEVELOPMENT_URL
-                          : BACKEND_DEPLOYED_URL
-                      }/${message.fileName}`}
-                      alt="Sent Image"
-                      className="max-w-[200px] max-h-[200px] rounded-lg border"
-                    />
+                  <div className="flex justify-center flex-col">
+                    <div>
+                      <img
+                        src={`${
+                          NODE_ENV === "development"
+                            ? BACKEND_DEVELOPMENT_URL
+                            : BACKEND_DEPLOYED_URL
+                        }/${message.fileName}`}
+                        alt="Sent Image"
+                        className="max-w-[200px] max-h-[200px] rounded-lg border"
+                      />
+                    </div>
+                    <div className="flex justify-end items-end pt-2">
+                      <button
+                        onClick={() =>
+                          handleDownload(
+                            `${
+                              NODE_ENV === "development"
+                                ? BACKEND_DEVELOPMENT_URL
+                                : BACKEND_DEPLOYED_URL
+                            }/${message.fileName}`,
+                            message.fileName
+                          )
+                        }
+                        className="text-blue-500 hover:underline"
+                      >
+                        <Download />
+                      </button>
+                    </div>
                   </div>
                   <div className="flex justify-end pt-1">
                     <div className="text-xs text-neutral-400">
@@ -194,21 +217,28 @@ const MessageContainer = () => {
                       </div>
                     </div>
                   )}
-                  {/* Display File Link */}
-                  <div className="flex items-center gap-2 border p-2 rounded-lg">
-                    <span className="text-sm">{message.fileName}</span>
-                    <a
-                      href={`${
-                        NODE_ENV === "development"
-                          ? BACKEND_DEVELOPMENT_URL
-                          : BACKEND_DEPLOYED_URL
-                      }/${message.fileName}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+
+                  {/* Display File Link with Icon */}
+                  <div className="flex items-center gap-2 rounded-lg border-none">
+                    {getFileTypeIcon(message.fileName)}
+                    <span className="text-sm">
+                      {cleanFileName(message.fileName)}
+                    </span>
+                    <button
+                      onClick={() =>
+                        handleDownload(
+                          `${
+                            NODE_ENV === "development"
+                              ? BACKEND_DEVELOPMENT_URL
+                              : BACKEND_DEPLOYED_URL
+                          }/${message.fileName}`,
+                          message.fileName
+                        )
+                      }
                       className="text-blue-500 hover:underline"
                     >
-                      Download
-                    </a>
+                      <Download />
+                    </button>
                   </div>
                   <div className="flex justify-end pt-1">
                     <div className="text-xs text-neutral-400">

@@ -5,3 +5,8 @@ export const animationDefaultOptions = {
   autoplay: true,
   animationData: animationData,
 };
+
+export const cleanFileName = (fileName: string) => {
+  return fileName.replace(/-\d{13}-\d+/, "");
+};
+
