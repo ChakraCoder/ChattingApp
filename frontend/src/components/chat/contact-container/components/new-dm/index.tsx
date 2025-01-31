@@ -1,10 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +6,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import Lottie from "react-lottie";
@@ -36,12 +28,17 @@ import {
 } from "@/app/slice/chatSlice";
 import { addIndividualChat } from "@/apis/chatApiServices";
 
-const NewDm = () => {
+const NewDm = ({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (val: boolean) => void;
+}) => {
   const userId = useAppSelector((state) => state.user.id);
   const { allExistingChatsData } = useAppSelector((state) => state.chat);
   const dispatch = useAppDispatch();
   const handleError = useErrorHandler();
-  const [openNewContactModel, setOpenNewContactModel] = useState(false);
   const [searchedContacts, setSearchedContacts] = useState<UserState[]>([]);
 
   const searchContacts = async (searchTerm: string) => {
@@ -62,7 +59,7 @@ const NewDm = () => {
 
   const selectNewContact = async (contact: UserState) => {
     try {
-      setOpenNewContactModel(false);
+      setOpen(false);
       dispatch(setSelectedChatData(contact));
       setSearchedContacts([]);
 
@@ -114,24 +111,7 @@ const NewDm = () => {
 
   return (
     <div>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              className="bg-transparent border-none hover:bg-transparent hover:text-neutral-100 text-neutral-400 font-light text-opacity-90 cursor-pointer transition-all duration-300"
-              onClick={() => setOpenNewContactModel(true)}
-            >
-              <Plus />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent className="bg-[#1c1b1e] border-none mb-2 p-3 text-white">
-            <p>New Contact</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <Dialog open={openNewContactModel} onOpenChange={setOpenNewContactModel}>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="bg-[#181920] border-none text-white w-[400px] h-[400px] flex flex-col">
           <DialogHeader>
             <DialogTitle>Please Select a contact</DialogTitle>

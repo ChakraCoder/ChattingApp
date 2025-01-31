@@ -1,8 +1,8 @@
 // import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ResizablePanel } from "../../ui/resizable";
-import CreateGroup from "./components/create-group";
+// import CreateGroup from "./components/create-group";
 import IndividualChat from "./components/IndividualChat";
-import NewDm from "./components/new-dm";
+import NewChat from "./components/new-chat";
 import ProfileInfo from "./components/profile-info";
 
 const ContactsContainer = () => {
@@ -18,19 +18,23 @@ const ContactsContainer = () => {
           <Logo />
         </div>
         <div className="my-5">
-          <div className="flex items-center justify-between pr-10">
-            <Title text="Chats" />
-            <NewDm />
+          <div className="flex items-center justify-between">
+            <div className="flex justify-start items-start">
+              <Title text="Chats" />
+            </div>
+            <div className="flex justify-end items-end px-4">
+              <NewChat />
+            </div>
           </div>
           <div className="max-h-[38vh] overflow-y-auto scrollbar-hidden">
             <IndividualChat />
           </div>
         </div>
         <div className="my-5">
-          <div className="flex items-center justify-between pr-10">
+          {/* <div className="flex items-center justify-between pr-10">
             <Title text="Group Chats" />
             <CreateGroup />
-          </div>
+          </div> */}
           <ProfileInfo />
         </div>
       </ResizablePanel>
