@@ -14,7 +14,9 @@ const ChatHeader = () => {
   const handleError = useErrorHandler();
   const dispatch = useAppDispatch();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { selectedChatData }: any = useAppSelector((state) => state.chat);
+  const { selectedChatData, selectedChatDetails }: any = useAppSelector(
+    (state) => state.chat
+  );
 
   const chatClose = () => {
     try {
@@ -31,7 +33,9 @@ const ChatHeader = () => {
             <Avatar className="h-12 w-12 rounded-full overflow-hidden">
               <AvatarImage
                 src={
-                  selectedChatData.profileImage !== null
+                  selectedChatDetails.chatType === "GROUP"
+                    ? "/group-chat.png"
+                    : selectedChatData.profileImage !== null
                     ? `${
                         NODE_ENV === "development"
                           ? BACKEND_DEVELOPMENT_URL
@@ -40,20 +44,28 @@ const ChatHeader = () => {
                     : "/no-profile.jpg"
                 }
                 alt="profile"
-                className="object-cover w-full h-full bg-black"
+                className="object-cover w-full h-full bg-white"
               />
             </Avatar>
           </div>
-          <div>
-            <p className="text-white mb-1">
-              {selectedChatData.firstName &&
-                selectedChatData.lastName &&
-                `${selectedChatData.firstName} ${selectedChatData.lastName}`}
-            </p>
-            <p className="text-white">
-              {selectedChatData.userName && `${selectedChatData.userName} `}
-            </p>
-          </div>
+          {selectedChatDetails.chatType === "GROUP" ? (
+            <div>
+              <p className="text-white">
+                {selectedChatDetails.groupName}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-white mb-1">
+                {selectedChatData.firstName &&
+                  selectedChatData.lastName &&
+                  `${selectedChatData.firstName} ${selectedChatData.lastName}`}
+              </p>
+              <p className="text-white">
+                {selectedChatData.userName && `${selectedChatData.userName} `}
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex gap-5 items-center justify-center">
           <Button

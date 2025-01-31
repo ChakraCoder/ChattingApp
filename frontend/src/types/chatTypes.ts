@@ -22,7 +22,6 @@ export type Message = {
     userName: string;
     profileImage: string;
   };
-  chat: Chat;
   mediaUrl: string;
   createdAt: string;
   updatedAt: string;

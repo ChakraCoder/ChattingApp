@@ -4,6 +4,7 @@ import {
   addGroupChatService,
   addIndividualChatService,
   getAllChatService,
+  getChatService,
 } from "../services/chatService";
 
 export const addIndividualChatController = async (
@@ -61,6 +62,26 @@ export const getAllChatController = async (
     });
   } catch (error) {
     console.error("Error during getAllChatController:", error);
+    next(error);
+  }
+};
+
+export const getChatController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const chatId = req.params.chatId;
+    const chat = await getChatService(chatId);
+
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "Fetched chat.",
+      data: { chat },
+    });
+  } catch (error) {
+    console.error("Error during getChatController:", error);
     next(error);
   }
 };

@@ -68,3 +68,6 @@ export const getAllUserChats = async () => {
   return await chatApiService.get("");
 };
 
+export const getUserChat = async (chatId: string) => {
+  return await chatApiService.get(`${chatId}`);
+};

@@ -28,11 +28,18 @@ const chatSlice = createSlice({
       state,
       action: PayloadAction<{ latestMessage: LatestMessage; chatId: string }>
     ) => {
-      state.allExistingChatsData.filter((chat) => {
-        if (chat.id === action.payload.chatId) {
-          chat.latestMessage = action.payload.latestMessage;
-        }
-      });
+      const existingChat = state.allExistingChatsData.find(
+        (chat) => chat.id === action.payload.chatId
+      );
+
+      if (existingChat) {
+        // Update the latest message of the existing chat
+        existingChat.latestMessage = action.payload.latestMessage;
+      }
+    },
+    addChatData: (state, action) => {
+      // @ts-expect-error payloadnot defined
+      state.allExistingChatsData.push(action.payload);
     },
     setSelectedChatData: (state, action: PayloadAction<UserState | null>) => {
       state.selectedChatData = action.payload;
@@ -73,5 +80,6 @@ export const {
   closeChat,
   addMessage,
   clearChat,
+  addChatData,
 } = chatSlice.actions;
 export default chatSlice.reducer;

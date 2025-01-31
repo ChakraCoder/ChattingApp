@@ -9,11 +9,14 @@ import {
   addGroupChatController,
   addIndividualChatController,
   getAllChatController,
+  getChatController,
 } from "../controllers/chatController";
 
 const chatRouter = Router();
 
 chatRouter.get("", authenticate, getAllChatController);
+
+chatRouter.get("/:chatId", authenticate, getChatController);
 
 chatRouter.post(
   "/individual-chat",

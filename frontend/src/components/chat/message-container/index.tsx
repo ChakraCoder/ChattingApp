@@ -67,8 +67,7 @@ const MessageContainer = () => {
               {moment(message.createdAt).format("LL")}
             </div>
           )}
-          {selectedChatDetails?.chatType === "INDIVIDUAL" &&
-            renderDMMessages(message)}
+          {renderDMMessages(message)}
         </div>
       );
     });

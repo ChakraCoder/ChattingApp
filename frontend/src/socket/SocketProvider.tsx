@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
+  addChatData,
   addMessage,
   updateLatestMessageOfExistingChat,
 } from "@/app/slice/chatSlice";
@@ -12,6 +13,7 @@ import {
 } from "@/constants/env";
 import { Message } from "@/types/chatTypes";
 import { SocketContext } from "./useSocket";
+import { getUserChat } from "@/apis/chatApiServices";
 
 interface SocketProviderProps {
   children: React.ReactNode;
@@ -20,9 +22,17 @@ interface SocketProviderProps {
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const socket = useRef<Socket | null>(null);
   const userInfo = useAppSelector((state) => state.user);
-  const { selectedChatDetails } = useAppSelector((state) => state.chat);
+  const { selectedChatDetails, allExistingChatsData } = useAppSelector(
+    (state) => state.chat
+  );
   const selectedChatRef = useRef(selectedChatDetails);
+  const allExistingChatsRef = useRef(allExistingChatsData);
   const dispatch = useAppDispatch();
+
+  // Update ref whenever chats change
+  useEffect(() => {
+    allExistingChatsRef.current = allExistingChatsData;
+  }, [allExistingChatsData]);
 
   useEffect(() => {
     if (userInfo) {
@@ -41,21 +51,36 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       socket.current.on("newMessage", (message: Message) => {
-        console.log("newMessage", message);
-        dispatch(
-          updateLatestMessageOfExistingChat({
-            chatId: message.chatId,
-            latestMessage: {
-              id: message.id,
-              type: message.type,
-              content: message.content,
-              mediaUrl: message.mediaUrl,
-              fileName: message.fileName,
-              timestamp: message.updatedAt,
-              senderId: message.senderId,
-            },
-          })
+
+        const existingChat = allExistingChatsRef.current.find(
+          (chat) => chat.id === message.chatId
         );
+
+        if (existingChat) {
+          dispatch(
+            updateLatestMessageOfExistingChat({
+              chatId: message.chatId,
+              latestMessage: {
+                id: message.id,
+                type: message.type,
+                content: message.content,
+                mediaUrl: message.mediaUrl,
+                fileName: message.fileName,
+                timestamp: message.updatedAt,
+                senderId: message.senderId,
+              },
+            })
+          );
+        } else {
+          (async () => {
+            try {
+              const addChat = await getUserChat(message.chatId);
+              dispatch(addChatData(addChat.data.data.chat));
+            } catch (error) {
+              console.error("Error fetching chat:", error);
+            }
+          })();
+        }
 
         if (
           selectedChatRef.current &&

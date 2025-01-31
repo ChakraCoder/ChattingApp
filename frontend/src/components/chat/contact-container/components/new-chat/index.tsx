@@ -8,9 +8,11 @@ import {
 import { Plus } from "lucide-react";
 import NewDm from "../new-dm";
 import { useState } from "react";
+import CreateGroup from "../create-group";
 
 const NewChat = () => {
-  const [openNewDm, setOpenNewDm] = useState(false);
+  const [openNewDmModel, setOpenNewDmModel] = useState(false);
+  const [openCreateGroupModel, setoOpenCreateGroupModel] = useState(false);
 
   return (
     <>
@@ -25,17 +27,28 @@ const NewChat = () => {
           <DropdownMenuItem
             onClick={() => {
               document.body.style.pointerEvents = "auto";
-              setOpenNewDm(true);
+              setOpenNewDmModel(true);
             }}
           >
             Individual Chat
           </DropdownMenuItem>
-          <DropdownMenuItem>Group Chat</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              document.body.style.pointerEvents = "auto";
+              setoOpenCreateGroupModel(true);
+            }}
+          >
+            Group Chat
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       {/* Pass openNewDm state to NewDm */}
-      <NewDm open={openNewDm} setOpen={setOpenNewDm} />
+      <NewDm open={openNewDmModel} setOpen={setOpenNewDmModel} />
+      <CreateGroup
+        open={openCreateGroupModel}
+        setOpen={setoOpenCreateGroupModel}
+      />
     </>
   );
 };

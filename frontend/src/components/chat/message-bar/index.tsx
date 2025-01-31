@@ -41,11 +41,7 @@ const MessageBar = () => {
   };
   const handleSendMessage = async () => {
     try {
-      if (
-        message.trim() !== "" &&
-        selectedChatDetails?.chatType === "INDIVIDUAL" &&
-        socket
-      ) {
+      if (message.trim() !== "" && selectedChatDetails && socket) {
         socket.emit("sendMessage", {
           senderId: userInfo.id,
           chatId: selectedChatDetails.id,
@@ -79,7 +75,7 @@ const MessageBar = () => {
           sendFileMessage.data.data.uploadFile;
 
         if (sendFileMessage.status === STATUS_CODES.OK) {
-          if (selectedChatDetails?.chatType === "INDIVIDUAL") {
+          if (selectedChatDetails) {
             socket.emit("sendMessage", {
               senderId: userInfo.id,
               chatId: selectedChatDetails.id,
