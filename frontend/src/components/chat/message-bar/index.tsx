@@ -25,6 +25,10 @@ const MessageBar = () => {
   const handleError = useErrorHandler();
 
   useEffect(() => {
+    setMessage("");
+  }, [selectedChatDetails]);
+
+  useEffect(() => {
     function handleClickOutside(event: Event) {
       if (emojiRef.current && !emojiRef.current.contains(event.target)) {
         setEmojiPickerOpen(false);
@@ -93,13 +97,30 @@ const MessageBar = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleOnChange = (e: any) => {
+    try {
+      e.preventDefault();
+      setMessage(e.target.value);
+
+      if (selectedChatDetails && socket) {
+        socket.emit("senderTyping", {
+          senderId: userInfo.id,
+          chatId: selectedChatDetails.id,
+        });
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
   return (
     <div className="h-[17vh] sm:h-[12vh] bg-[#1c1d25] p-4 flex flex-row">
       <ChatInput
         value={message}
         placeholder="Type a message..."
         className="focus:border-none border-none bg-[#2a2b33] text-white rounded-none"
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) => handleOnChange(e)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();

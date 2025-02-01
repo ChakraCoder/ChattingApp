@@ -8,7 +8,7 @@ export default function MessageLoading() {
       xmlns="http://www.w3.org/2000/svg"
       className="text-foreground"
     >
-      <circle cx="4" cy="12" r="2" fill="currentColor">
+      <circle cx="4" cy="12" r="2" fill="currentColor" color="white">
         <animate
           id="spinner_qFRN"
           begin="0;spinner_OcgL.end+0.25s"
@@ -19,7 +19,7 @@ export default function MessageLoading() {
           keySplines=".33,.66,.66,1;.33,0,.66,.33"
         />
       </circle>
-      <circle cx="12" cy="12" r="2" fill="currentColor">
+      <circle cx="12" cy="12" r="2" fill="currentColor" color="white">
         <animate
           begin="spinner_qFRN.begin+0.1s"
           attributeName="cy"
@@ -29,7 +29,7 @@ export default function MessageLoading() {
           keySplines=".33,.66,.66,1;.33,0,.66,.33"
         />
       </circle>
-      <circle cx="20" cy="12" r="2" fill="currentColor">
+      <circle cx="20" cy="12" r="2" fill="currentColor" color="white">
         <animate
           id="spinner_OcgL"
           begin="spinner_qFRN.begin+0.2s"

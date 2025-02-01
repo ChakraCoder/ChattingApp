@@ -112,7 +112,7 @@ const ChatBubbleMessage = React.forwardRef<
       {...props}
     >
       {isLoading ? (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 ">
           <MessageLoading />
         </div>
       ) : (

@@ -8,13 +8,13 @@ import {
 import { UserState } from "@/types/userTypes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// Define the state type
-
+// Define the initial state using the updated ChatState interface
 const initialState: ChatState = {
-  selectedChatData: null,
   selectedChatDetails: null,
+  selectedChatData: null,
   selectedChatMessages: [],
   allExistingChatsData: [],
+  typingIndicator: {},
 };
 
 const chatSlice = createSlice({
@@ -31,14 +31,11 @@ const chatSlice = createSlice({
       const existingChat = state.allExistingChatsData.find(
         (chat) => chat.id === action.payload.chatId
       );
-
       if (existingChat) {
-        // Update the latest message of the existing chat
         existingChat.latestMessage = action.payload.latestMessage;
       }
     },
     addChatData: (state, action) => {
-      // @ts-expect-error payloadnot defined
       state.allExistingChatsData.push(action.payload);
     },
     setSelectedChatData: (state, action: PayloadAction<UserState | null>) => {
@@ -56,10 +53,7 @@ const chatSlice = createSlice({
       state.selectedChatMessages = [];
     },
     addMessage: (state, action: PayloadAction<Message>) => {
-      state.selectedChatMessages = [
-        ...state.selectedChatMessages,
-        action.payload,
-      ];
+      state.selectedChatMessages = [...state.selectedChatMessages, action.payload];
     },
     clearChat: (state) => {
       state.selectedChatDetails = null;
@@ -67,10 +61,25 @@ const chatSlice = createSlice({
       state.selectedChatMessages = [];
       state.allExistingChatsData = [];
     },
+    setTypingIndicator: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        senderId: string;
+        userName: string;
+        profileImage: string;
+      }>
+    ) => {
+      const { chatId, senderId, userName, profileImage } = action.payload;
+      state.typingIndicator[chatId] = { senderId, userName, profileImage };
+    },
+    clearTypingIndicator: (state, action: PayloadAction<{ chatId: string }>) => {
+      const { chatId } = action.payload;
+      state.typingIndicator[chatId] = null;
+    },
   },
 });
 
-// Export actions and reducer
 export const {
   setSelectedChatData,
   selectedChatDetails,
@@ -81,5 +90,7 @@ export const {
   addMessage,
   clearChat,
   addChatData,
+  setTypingIndicator,
+  clearTypingIndicator,
 } = chatSlice.actions;
 export default chatSlice.reducer;

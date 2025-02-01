@@ -63,9 +63,18 @@ export type ChatDetails = {
   latestMessage: LatestMessage | null;
 };
 
+// types/chatTypes.ts
+
 export interface ChatState {
   selectedChatDetails: Chat | null;
   selectedChatData: UserState | null;
-  selectedChatMessages: Message[] | [];
-  allExistingChatsData: ChatDetails[] | [];
+  selectedChatMessages: Message[];
+  allExistingChatsData: ChatDetails[];
+  typingIndicator: { [chatId: string]: TypingIndicator | null };
+}
+
+export interface TypingIndicator {
+  senderId: string;
+  userName: string;
+  profileImage: string;
 }

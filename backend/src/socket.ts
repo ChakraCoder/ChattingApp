@@ -89,6 +89,62 @@ const setupSocket = (server: Server) => {
     }
   };
 
+  const handleSenderTyping = async (data: {
+    senderId: string;
+    chatId: string;
+  }) => {
+    try {
+      const { senderId, chatId } = data;
+
+      // Validate and fetch chat participants
+      const chat = await prisma.chat.findUnique({
+        where: { id: chatId },
+        include: { participants: { select: { userId: true } } },
+      });
+
+      if (!chat) {
+        throw new Error("Chat not found");
+      }
+
+      // Ensure the sender is a participant of the chat
+      const isSenderInChat = chat.participants.some(
+        (p) => p.userId === senderId,
+      );
+      if (!isSenderInChat) {
+        throw new Error("Sender is not a participant of this chat");
+      }
+
+      // Fetch sender's profile information
+      const senderInfo = await prisma.user.findUnique({
+        where: { id: senderId },
+        select: { userName: true, profileImage: true },
+      });
+
+      if (!senderInfo) {
+        throw new Error("Sender information not found");
+      }
+
+      // Emit the typing indicator to all participants except the sender,
+      // including sender's username and profileImage.
+      chat.participants.forEach((participant) => {
+        if (participant.userId !== senderId) {
+          const recipientSocketId = userSocketMap.get(participant.userId);
+          if (recipientSocketId) {
+            io.to(recipientSocketId).emit("senderTyping", {
+              senderId,
+              chatId,
+              userName: senderInfo.userName,
+              profileImage: senderInfo.profileImage,
+            });
+          }
+        }
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error in handleSenderTyping:", error.message);
+    }
+  };
+
   // Handle socket connection
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId as string;
@@ -103,6 +159,7 @@ const setupSocket = (server: Server) => {
 
     // Register event handlers
     socket.on("sendMessage", handleSendMessage);
+    socket.on("senderTyping", handleSenderTyping);
     socket.on("disconnect", () => handleDisconnect(socket));
   });
 };

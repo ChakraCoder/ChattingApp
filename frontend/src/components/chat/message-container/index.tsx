@@ -24,9 +24,8 @@ import { handleDownload } from "@/utils/handleDownload";
 
 const MessageContainer = () => {
   const { scrollRef, scrollToBottom, disableAutoScroll } = useAutoScroll();
-  const { selectedChatMessages, selectedChatDetails } = useAppSelector(
-    (state) => state.chat
-  );
+  const { selectedChatMessages, selectedChatDetails, typingIndicator } =
+    useAppSelector((state) => state.chat);
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector((state) => state.user);
   const handleError = useErrorHandler();
@@ -50,7 +49,7 @@ const MessageContainer = () => {
   useEffect(() => {
     scrollToBottom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChatMessages]);
+  }, [selectedChatMessages, typingIndicator]);
 
   const renderMessages = () => {
     let lastDate: string | null = null;
@@ -75,7 +74,6 @@ const MessageContainer = () => {
 
   const renderDMMessages = (message: Message) => {
     const messageTime = moment(message.updatedAt).format("LT");
-
     return (
       <>
         {/* TEXT MESSAGE */}
@@ -255,11 +253,48 @@ const MessageContainer = () => {
 
   return (
     <div
-      className="flex-1 overflow-y-auto scrollbar-hidden w-full"
+      className="flex-col overflow-y-auto scrollbar-hidden w-full h-full"
       ref={scrollRef}
-      onScroll={disableAutoScroll} // Disable auto-scroll when the user manually scrolls
+      onScroll={disableAutoScroll}
     >
-      {renderMessages()}
+      <div>{renderMessages()}</div>
+      <div>
+        {/* Typing Indicator */}
+        {selectedChatDetails &&
+          typingIndicator[selectedChatDetails.id] &&
+          typingIndicator[selectedChatDetails.id] !== userInfo.id && (
+            <ChatMessageList>
+              <ChatBubble variant="received">
+                <ChatBubbleAvatar
+                  src={
+                    typingIndicator[selectedChatDetails.id]?.profileImage !==
+                    null
+                      ? `${
+                          NODE_ENV === "development"
+                            ? BACKEND_DEVELOPMENT_URL
+                            : BACKEND_DEPLOYED_URL
+                        }/${
+                          typingIndicator[selectedChatDetails.id]?.profileImage
+                        }`
+                      : "/no-profile.jpg"
+                  }
+                />
+
+                <ChatBubbleMessage variant="received">
+                  {selectedChatDetails?.chatType === "GROUP" && (
+                    <div className="flex justify-start">
+                      <div className="text-xs text-neutral-400">
+                        {`~ ` +
+                          typingIndicator[selectedChatDetails.id]?.userName}
+                      </div>
+                    </div>
+                  )}
+                  <ChatBubbleMessage isLoading />
+                </ChatBubbleMessage>
+              </ChatBubble>
+            </ChatMessageList>
+          )}
+      </div>
     </div>
   );
 };

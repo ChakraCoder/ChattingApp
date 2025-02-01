@@ -5,6 +5,8 @@ import {
   addChatData,
   addMessage,
   updateLatestMessageOfExistingChat,
+  setTypingIndicator,
+  clearTypingIndicator,
 } from "@/app/slice/chatSlice";
 import {
   BACKEND_DEPLOYED_URL,
@@ -51,7 +53,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       socket.current.on("newMessage", (message: Message) => {
-
         const existingChat = allExistingChatsRef.current.find(
           (chat) => chat.id === message.chatId
         );
@@ -89,6 +90,38 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
           dispatch(addMessage(message));
         }
       });
+
+      // Handle senderTyping event with additional sender info
+      socket.current.on(
+        "senderTyping",
+        (data: {
+          senderId: string;
+          chatId: string;
+          userName: string;
+          profileImage: string;
+        }) => {
+          // Only update typing indicator for the currently selected chat
+          if (
+            selectedChatRef.current &&
+            selectedChatRef.current.id === data.chatId
+          ) {
+            // Set typing indicator including sender details
+            dispatch(
+              setTypingIndicator({
+                chatId: data.chatId,
+                senderId: data.senderId,
+                userName: data.userName,
+                profileImage: data.profileImage,
+              })
+            );
+
+            // Optionally clear the indicator after a delay (e.g., 3 seconds)
+            setTimeout(() => {
+              dispatch(clearTypingIndicator({ chatId: data.chatId }));
+            }, 3000);
+          }
+        }
+      );
 
       return () => {
         socket.current?.disconnect();
