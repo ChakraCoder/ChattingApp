@@ -280,17 +280,21 @@ const MessageContainer = () => {
                   }
                 />
 
-                <ChatBubbleMessage variant="received">
-                  {selectedChatDetails?.chatType === "GROUP" && (
+                {selectedChatDetails?.chatType === "GROUP" && (
+                  <ChatBubbleMessage variant="received">
                     <div className="flex justify-start">
                       <div className="text-xs text-neutral-400">
                         {`~ ` +
                           typingIndicator[selectedChatDetails.id]?.userName}
                       </div>
                     </div>
-                  )}
+                    <ChatBubbleMessage isLoading />
+                  </ChatBubbleMessage>
+                )}
+
+                {selectedChatDetails?.chatType === "INDIVIDUAL" && (
                   <ChatBubbleMessage isLoading />
-                </ChatBubbleMessage>
+                )}
               </ChatBubble>
             </ChatMessageList>
           )}

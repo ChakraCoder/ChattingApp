@@ -115,7 +115,7 @@ const MessageBar = () => {
   };
 
   return (
-    <div className="h-[17vh] sm:h-[12vh] bg-[#1c1d25] p-4 flex flex-row">
+    <div className="h-[22vh] sm:h-[12vh] bg-[#1c1d25] p-4 flex flex-row">
       <ChatInput
         value={message}
         placeholder="Type a message..."
