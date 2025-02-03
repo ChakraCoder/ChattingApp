@@ -5,13 +5,11 @@ import {
   LatestMessage,
   Message,
 } from "@/types/chatTypes";
-import { UserState } from "@/types/userTypes";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Define the initial state using the updated ChatState interface
 const initialState: ChatState = {
   selectedChatDetails: null,
-  selectedChatData: null,
   selectedChatMessages: [],
   allExistingChatsData: [],
   typingIndicator: {},
@@ -38,18 +36,14 @@ const chatSlice = createSlice({
     addChatData: (state, action) => {
       state.allExistingChatsData.push(action.payload);
     },
-    setSelectedChatData: (state, action: PayloadAction<UserState | null>) => {
-      state.selectedChatData = action.payload;
-    },
     setSelectedChatMessages: (state, action: PayloadAction<Message[]>) => {
       state.selectedChatMessages = action.payload;
     },
-    selectedChatDetails: (state, action: PayloadAction<Chat | null>) => {
+    setSelectedChatDetails: (state, action: PayloadAction<Chat | null>) => {
       state.selectedChatDetails = action.payload;
     },
     closeChat: (state) => {
       state.selectedChatDetails = null;
-      state.selectedChatData = null;
       state.selectedChatMessages = [];
     },
     addMessage: (state, action: PayloadAction<Message>) => {
@@ -57,7 +51,6 @@ const chatSlice = createSlice({
     },
     clearChat: (state) => {
       state.selectedChatDetails = null;
-      state.selectedChatData = null;
       state.selectedChatMessages = [];
       state.allExistingChatsData = [];
     },
@@ -81,8 +74,7 @@ const chatSlice = createSlice({
 });
 
 export const {
-  setSelectedChatData,
-  selectedChatDetails,
+  setSelectedChatDetails,
   setSelectedChatMessages,
   setAllExistingChatsData,
   updateLatestMessageOfExistingChat,

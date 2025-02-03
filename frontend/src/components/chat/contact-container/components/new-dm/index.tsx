@@ -23,8 +23,7 @@ import {
 } from "@/constants/env";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
-  selectedChatDetails,
-  setSelectedChatData,
+  setSelectedChatDetails
 } from "@/app/slice/chatSlice";
 import { addIndividualChat } from "@/apis/chatApiServices";
 
@@ -60,7 +59,6 @@ const NewDm = ({
   const selectNewContact = async (contact: UserState) => {
     try {
       setOpen(false);
-      dispatch(setSelectedChatData(contact));
       setSearchedContacts([]);
 
       const existingChat = allExistingChatsData.find(
@@ -70,12 +68,13 @@ const NewDm = ({
       );
 
       if (existingChat) {
-        const { id, groupName, isGroupChat, createdAt, updatedAt } =
+        const { id, groupName, isGroupChat, participants, createdAt, updatedAt } =
           existingChat;
         dispatch(
-          selectedChatDetails({
+          setSelectedChatDetails({
             id,
             groupName,
+            participants,
             chatType: isGroupChat === true ? "GROUP" : "INDIVIDUAL",
             createdAt,
             updatedAt,
@@ -89,12 +88,19 @@ const NewDm = ({
             participants: [contact.id, userId],
           });
 
-          const { id, groupName, isGroupChat, createdAt, updatedAt } =
-            IndividualChatAdd.data.data.chat;
+          const {
+            id,
+            groupName,
+            isGroupChat,
+            participants,
+            createdAt,
+            updatedAt,
+          } = IndividualChatAdd.data.data.chat;
           dispatch(
-            selectedChatDetails({
+            setSelectedChatDetails({
               id,
               groupName,
+              participants,
               chatType: isGroupChat === true ? "GROUP" : "INDIVIDUAL",
               createdAt,
               updatedAt,

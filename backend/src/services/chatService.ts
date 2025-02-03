@@ -41,9 +41,37 @@ export const addIndividualChatService = async ({
         })),
       },
     },
+    include: {
+      participants: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              userName: true,
+              profileImage: true,
+            },
+          },
+        },
+      },
+    },
   });
 
-  return chat;
+  return {
+    id: chat.id,
+    isGroupChat: chat.isGroupChat,
+    groupName: chat.groupName,
+    createdAt: chat.createdAt,
+    updatedAt: chat.updatedAt,
+    participants: chat.participants.map((participant) => ({
+      id: participant.user.id,
+      firstName: participant.user.firstName,
+      lastName: participant.user.lastName,
+      userName: participant.user.userName,
+      profileImage: participant.user.profileImage,
+    })),
+  };
 };
 
 export const addGroupChatService = async ({
@@ -65,8 +93,36 @@ export const addGroupChatService = async ({
         })),
       },
     },
+    include: {
+      participants: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              userName: true,
+              profileImage: true,
+            },
+          },
+        },
+      },
+    },
   });
-  return chat;
+  return {
+    id: chat.id,
+    isGroupChat: chat.isGroupChat,
+    groupName: chat.groupName,
+    createdAt: chat.createdAt,
+    updatedAt: chat.updatedAt,
+    participants: chat.participants.map((participant) => ({
+      id: participant.user.id,
+      firstName: participant.user.firstName,
+      lastName: participant.user.lastName,
+      userName: participant.user.userName,
+      profileImage: participant.user.profileImage,
+    })),
+  };
 };
 
 export const getAllChatService = async (userId: string) => {

@@ -1,5 +1,3 @@
-import { UserState } from "./userTypes";
-
 export interface addIndividualChatPayload {
   isGroupChat: boolean;
   participants: string[];
@@ -31,6 +29,7 @@ export type Chat = {
   id: string;
   groupName?: string;
   chatType: "GROUP" | "INDIVIDUAL";
+  participants: Participant[];
   createdAt: string;
   updatedAt: string;
 };
@@ -40,7 +39,7 @@ export type Participant = {
   firstName: string;
   lastName: string;
   userName: string;
-  profileImage: string | null;
+  profileImage: string;
 };
 
 export type LatestMessage = {
@@ -67,7 +66,6 @@ export type ChatDetails = {
 
 export interface ChatState {
   selectedChatDetails: Chat | null;
-  selectedChatData: UserState | null;
   selectedChatMessages: Message[];
   allExistingChatsData: ChatDetails[];
   typingIndicator: { [chatId: string]: TypingIndicator | null };

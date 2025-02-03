@@ -42,6 +42,7 @@ const Profile = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<profilePayload>();
 
@@ -129,22 +130,27 @@ const Profile = () => {
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        setProfileImageError("Only image files are allowed.");
-        return;
-      }
+    try {
+      const file = event.target.files?.[0];
+      if (file) {
+        if (!file.type.startsWith("image/")) {
+          setProfileImageError("Only image files are allowed.");
+          return;
+        }
 
-      // Check file size (2MB = 2 * 1024 * 1024 bytes)
-      if (file.size > 2 * 1024 * 1024) {
-        setProfileImageError("File size must be under 2MB.");
-        return;
+        // Check file size (2MB = 2 * 1024 * 1024 bytes)
+        if (file.size > 2 * 1024 * 1024) {
+          setProfileImageError("File size must be under 2MB.");
+          setValue("profileImage", "");
+          return;
+        }
+        setProfileImageError(null);
+        const reader = new FileReader();
+        reader.onload = () => setPreviewImage(reader.result as string);
+        reader.readAsDataURL(file);
       }
-      setProfileImageError(null);
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file);
+    } catch (error) {
+      handleError(error);
     }
   };
 

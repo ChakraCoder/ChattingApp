@@ -106,24 +106,6 @@ const setupSocket = (server: Server) => {
         throw new Error("Chat not found");
       }
 
-      // Ensure the sender is a participant of the chat
-      const isSenderInChat = chat.participants.some(
-        (p) => p.userId === senderId,
-      );
-      if (!isSenderInChat) {
-        throw new Error("Sender is not a participant of this chat");
-      }
-
-      // Fetch sender's profile information
-      const senderInfo = await prisma.user.findUnique({
-        where: { id: senderId },
-        select: { userName: true, profileImage: true },
-      });
-
-      if (!senderInfo) {
-        throw new Error("Sender information not found");
-      }
-
       // Emit the typing indicator to all participants except the sender,
       // including sender's username and profileImage.
       chat.participants.forEach((participant) => {
@@ -133,8 +115,6 @@ const setupSocket = (server: Server) => {
             io.to(recipientSocketId).emit("senderTyping", {
               senderId,
               chatId,
-              userName: senderInfo.userName,
-              profileImage: senderInfo.profileImage,
             });
           }
         }

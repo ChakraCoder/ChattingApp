@@ -13,7 +13,7 @@ import {
   BACKEND_DEVELOPMENT_URL,
   NODE_ENV,
 } from "@/constants/env";
-import { Message } from "@/types/chatTypes";
+import { Message, Participant } from "@/types/chatTypes";
 import { SocketContext } from "./useSocket";
 import { getUserChat } from "@/apis/chatApiServices";
 
@@ -105,15 +105,21 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
             selectedChatRef.current &&
             selectedChatRef.current.id === data.chatId
           ) {
-            // Set typing indicator including sender details
-            dispatch(
-              setTypingIndicator({
-                chatId: data.chatId,
-                senderId: data.senderId,
-                userName: data.userName,
-                profileImage: data.profileImage,
-              })
+            selectedChatRef.current.participants.map(
+              (participant: Participant) => {
+                if (participant.id === data.senderId) {
+                  dispatch(
+                    setTypingIndicator({
+                      chatId: data.chatId,
+                      senderId: data.senderId,
+                      userName: participant.userName,
+                      profileImage: participant.profileImage,
+                    })
+                  );
+                }
+              }
             );
+            // Set typing indicator including sender details
 
             // Optionally clear the indicator after a delay (e.g., 3 seconds)
             setTimeout(() => {

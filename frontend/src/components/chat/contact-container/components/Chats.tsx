@@ -1,8 +1,7 @@
 import { useAppSelector } from "@/app/hooks";
 import {
   setSelectedChatMessages,
-  selectedChatDetails as setSelectedChatDetails,
-  setSelectedChatData,
+  setSelectedChatDetails,
 } from "@/app/slice/chatSlice";
 import { AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,32 +25,7 @@ const Chats = () => {
 
   useEffect(() => {
     const fetchChats = () => {
-      // Filter out group chats and individual chats
-      const individualChats = allExistingChatsData.filter(
-        (chat) => !chat.groupName
-      );
-      const groupChats = allExistingChatsData.filter(
-        (chat) => chat.isGroupChat
-      );
-
-      // Process individual chats: Only include participants not equal to userId
-      const updatedIndividualChats = individualChats
-        .map((chat: ChatDetails) => {
-          const participant = chat.participants.find(
-            (participant) => participant.id !== userId
-          );
-          if (participant) {
-            return {
-              ...chat,
-              participants: [participant],
-            };
-          }
-          return null;
-        })
-        .filter(Boolean);
-
-      // @ts-expect-error combine individual and groupchat
-      setChats([...updatedIndividualChats, ...groupChats]);
+      setChats(allExistingChatsData);
     };
 
     fetchChats();
@@ -60,90 +34,92 @@ const Chats = () => {
   // Handle clicking on a chat
   const handleClick = (chat: ChatDetails) => {
     if (selectedChatDetails?.id === chat.id) {
-      setSelectedChatMessages([]); // Clear chat messages when clicking on the same chat
+      dispatch(setSelectedChatMessages([])); // Clear chat messages when clicking on the same chat
     }
 
-    const { id, groupName, createdAt, updatedAt } = chat;
+    const { id, groupName, participants, createdAt, updatedAt } = chat;
 
     dispatch(
       setSelectedChatDetails({
         id,
         groupName,
+        participants,
         chatType: chat.isGroupChat ? "GROUP" : "INDIVIDUAL",
         createdAt,
         updatedAt,
       })
     );
-
-    // For individual chats, set the first participant as selected chat data
-    if (!chat.isGroupChat) {
-      // @ts-expect-error chatParticipants error
-      dispatch(setSelectedChatData(chat.participants[0]));
-    }
   };
 
   return (
     <div>
       <ul>
-        {chats.map((chat, index) => (
-          <li
-            key={index}
-            className={`pl-10 py-2 transition-all duration-300 cursor-pointer ${
-              selectedChatDetails?.id === chat.id
-                ? "bg-[#f1f1f111]"
-                : "hover:bg-[#f1f1f111]"
-            }`}
-            onClick={() => handleClick(chat)}
-          >
-            <div className="flex gap-5 items-center justify-start text-neutral-300">
-              <div className="w-12 h-12 relative">
-                <Avatar className="h-12 w-12 rounded-full overflow-hidden">
-                  <AvatarImage
-                    src={
-                      chat.isGroupChat
-                        ? "/group-chat.png"
-                        : chat.participants[0].profileImage
-                        ? `${
-                            NODE_ENV === "development"
-                              ? BACKEND_DEVELOPMENT_URL
-                              : BACKEND_DEPLOYED_URL
-                          }/${chat.participants[0].profileImage}`
-                        : "/no-profile.jpg"
-                    }
-                    alt="profile"
-                    className="object-cover w-full h-full bg-white rounded-full"
-                  />
-                </Avatar>
-              </div>
-              <div className="flex flex-col w-full">
-                <div className="flex flex-row">
-                  <p className="text-white text-base">
-                    {chat.isGroupChat
-                      ? chat.groupName
-                      : chat.participants[0].userName}
-                  </p>
-                  <div className="flex w-full px-4 justify-end items-end">
-                    <p className="text-gray-400 my-1 text-sm">
-                      {chat.latestMessage?.timestamp
-                        ? moment(chat.latestMessage?.timestamp).format("LT")
-                        : ""}
-                    </p>
-                  </div>
+        {chats.map((chat, index) => {
+          // For individual chats, find the participant that is not the logged-in user.
+          const otherParticipant = !chat.isGroupChat
+            ? chat.participants.find((p) => p.id !== userId)
+            : null;
+
+          return (
+            <li
+              key={index}
+              className={`pl-10 py-2 transition-all duration-300 cursor-pointer ${
+                selectedChatDetails?.id === chat.id
+                  ? "bg-[#f1f1f111]"
+                  : "hover:bg-[#f1f1f111]"
+              }`}
+              onClick={() => handleClick(chat)}
+            >
+              <div className="flex gap-5 items-center justify-start text-neutral-300">
+                <div className="w-12 h-12 relative">
+                  <Avatar className="h-12 w-12 rounded-full overflow-hidden">
+                    <AvatarImage
+                      src={
+                        chat.isGroupChat
+                          ? "/group-chat.png"
+                          : otherParticipant?.profileImage
+                          ? `${
+                              NODE_ENV === "development"
+                                ? BACKEND_DEVELOPMENT_URL
+                                : BACKEND_DEPLOYED_URL
+                            }/${otherParticipant.profileImage}`
+                          : "/no-profile.jpg"
+                      }
+                      alt="profile"
+                      className="object-cover w-full h-full bg-white rounded-full"
+                    />
+                  </Avatar>
                 </div>
-                <p className="text-gray-400 my-1 text-sm">
-                  {(() => {
-                    const message = chat.latestMessage;
-                    const content = message?.content || message?.fileName;
-                    if (content && content?.length > 30) {
-                      return `${content.slice(0, 28)}...`;
-                    }
-                    return content || "No recent messages";
-                  })()}
-                </p>
+                <div className="flex flex-col w-full">
+                  <div className="flex flex-row">
+                    <p className="text-white text-base">
+                      {chat.isGroupChat
+                        ? chat.groupName
+                        : otherParticipant?.userName}
+                    </p>
+                    <div className="flex w-full px-4 justify-end items-end">
+                      <p className="text-gray-400 my-1 text-sm">
+                        {chat.latestMessage?.timestamp
+                          ? moment(chat.latestMessage.timestamp).format("LT")
+                          : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-gray-400 my-1 text-sm">
+                    {(() => {
+                      const message = chat.latestMessage;
+                      const content = message?.content || message?.fileName;
+                      if (content && content.length > 30) {
+                        return `${content.slice(0, 28)}...`;
+                      }
+                      return content || "No recent messages";
+                    })()}
+                  </p>
+                </div>
               </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

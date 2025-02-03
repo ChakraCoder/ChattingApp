@@ -11,7 +11,7 @@ import { STATUS_CODES } from "@/constants/statusCodes";
 import MultipleSelector from "@/components/ui/multiple-select";
 import { UserState } from "@/types/userTypes";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { selectedChatDetails } from "@/app/slice/chatSlice";
+import { setSelectedChatDetails } from "@/app/slice/chatSlice";
 import { addGroupChat } from "@/apis/chatApiServices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,13 +111,14 @@ const CreateGroup = ({
     try {
       setOpen(false);
       const groupChatAdd = await addGroupChat(payload);
-      const { id, groupName, isGroupChat, createdAt, updatedAt } =
+      const { id, groupName, isGroupChat, participants, createdAt, updatedAt } =
         groupChatAdd.data.data.chat;
       dispatch(
-        selectedChatDetails({
+        setSelectedChatDetails({
           id,
           groupName,
           chatType: isGroupChat === true ? "GROUP" : "INDIVIDUAL",
+          participants,
           createdAt,
           updatedAt,
         })
