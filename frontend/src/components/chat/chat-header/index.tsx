@@ -10,11 +10,13 @@ import {
   NODE_ENV,
 } from "@/constants/env";
 import { Participant } from "@/types/chatTypes";
+import { useSocket } from "@/socket/useSocket";
 
 const ChatHeader = () => {
   const handleError = useErrorHandler();
   const dispatch = useAppDispatch();
   const userId = useAppSelector((state) => state.user.id);
+  const socket = useSocket();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { selectedChatDetails }: any = useAppSelector((state) => state.chat);
 
@@ -26,6 +28,10 @@ const ChatHeader = () => {
   const chatClose = () => {
     try {
       dispatch(closeChat());
+      // When closing a chat
+      if (socket) {
+        socket.emit("leaveChat", { userId, chatId: selectedChatDetails.id });
+      }
     } catch (error) {
       handleError(error);
     }

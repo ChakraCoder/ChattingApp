@@ -42,12 +42,29 @@ const chatSlice = createSlice({
     setSelectedChatDetails: (state, action: PayloadAction<Chat | null>) => {
       state.selectedChatDetails = action.payload;
     },
+    readSelectedChatMessages: (state, action) => {
+      const { messageId, userId } = action.payload;
+      state.selectedChatMessages = state.selectedChatMessages.map((message) => {
+        if (message.id === messageId) {
+          return {
+            ...message,
+            readBy: message.readBy
+              ? [...new Set([...message.readBy, userId])]
+              : [userId],
+          };
+        }
+        return message;
+      });
+    },
     closeChat: (state) => {
       state.selectedChatDetails = null;
       state.selectedChatMessages = [];
     },
     addMessage: (state, action: PayloadAction<Message>) => {
-      state.selectedChatMessages = [...state.selectedChatMessages, action.payload];
+      state.selectedChatMessages = [
+        ...state.selectedChatMessages,
+        action.payload,
+      ];
     },
     clearChat: (state) => {
       state.selectedChatDetails = null;
@@ -66,7 +83,10 @@ const chatSlice = createSlice({
       const { chatId, senderId, userName, profileImage } = action.payload;
       state.typingIndicator[chatId] = { senderId, userName, profileImage };
     },
-    clearTypingIndicator: (state, action: PayloadAction<{ chatId: string }>) => {
+    clearTypingIndicator: (
+      state,
+      action: PayloadAction<{ chatId: string }>
+    ) => {
       const { chatId } = action.payload;
       state.typingIndicator[chatId] = null;
     },
@@ -78,6 +98,7 @@ export const {
   setSelectedChatMessages,
   setAllExistingChatsData,
   updateLatestMessageOfExistingChat,
+  readSelectedChatMessages,
   closeChat,
   addMessage,
   clearChat,

@@ -1,7 +1,7 @@
 import { useAppSelector } from "@/app/hooks";
 import {
-  setSelectedChatMessages,
   setSelectedChatDetails,
+  setAllExistingChatsData,
 } from "@/app/slice/chatSlice";
 import { AvatarImage } from "@/components/ui/avatar";
 import {
@@ -9,6 +9,8 @@ import {
   BACKEND_DEVELOPMENT_URL,
   NODE_ENV,
 } from "@/constants/env";
+import { Badge } from "@/components/ui/badge";
+import { useSocket } from "@/socket/useSocket";
 import { ChatDetails } from "@/types/chatTypes";
 import { Avatar } from "@radix-ui/react-avatar";
 import moment from "moment";
@@ -17,6 +19,7 @@ import { useDispatch } from "react-redux";
 
 const Chats = () => {
   const [chats, setChats] = useState<ChatDetails[]>([]);
+  const socket = useSocket();
   const userId = useAppSelector((state) => state.user.id);
   const dispatch = useDispatch();
   const { allExistingChatsData, selectedChatDetails } = useAppSelector(
@@ -33,22 +36,38 @@ const Chats = () => {
 
   // Handle clicking on a chat
   const handleClick = (chat: ChatDetails) => {
-    if (selectedChatDetails?.id === chat.id) {
-      dispatch(setSelectedChatMessages([])); // Clear chat messages when clicking on the same chat
+    if (selectedChatDetails?.id !== chat.id) {
+      if (socket) {
+        socket.emit("leaveChat", { userId, chatId: selectedChatDetails?.id });
+      }
+
+      const { id, groupName, participants, createdAt, updatedAt } = chat;
+      dispatch(
+        setSelectedChatDetails({
+          id,
+          groupName,
+          participants,
+          chatType: chat.isGroupChat ? "GROUP" : "INDIVIDUAL",
+          createdAt,
+          updatedAt,
+        })
+      );
+
+      const updatedChats = allExistingChatsData.map((existingChat) =>
+        existingChat.id === id
+          ? { ...existingChat, unreadCount: 0 }
+          : existingChat
+      );
+
+      dispatch(setAllExistingChatsData(updatedChats));
+
+      if (socket) {
+        socket.emit("joinChat", {
+          userId,
+          chatId: id,
+        });
+      }
     }
-
-    const { id, groupName, participants, createdAt, updatedAt } = chat;
-
-    dispatch(
-      setSelectedChatDetails({
-        id,
-        groupName,
-        participants,
-        chatType: chat.isGroupChat ? "GROUP" : "INDIVIDUAL",
-        createdAt,
-        updatedAt,
-      })
-    );
   };
 
   return (
@@ -98,23 +117,68 @@ const Chats = () => {
                         : otherParticipant?.userName}
                     </p>
                     <div className="flex w-full px-4 justify-end items-end">
-                      <p className="text-gray-400 my-1 text-sm">
+                      <p
+                        className={
+                          chat.unreadCount > 0
+                            ? "text-green-500 my-1 text-sm"
+                            : "text-gray-400 my-1 text-sm"
+                        }
+                      >
                         {chat.latestMessage?.timestamp
                           ? moment(chat.latestMessage.timestamp).format("LT")
                           : ""}
                       </p>
                     </div>
                   </div>
-                  <p className="text-gray-400 my-1 text-sm">
-                    {(() => {
-                      const message = chat.latestMessage;
-                      const content = message?.content || message?.fileName;
-                      if (content && content.length > 30) {
-                        return `${content.slice(0, 28)}...`;
-                      }
-                      return content || "No recent messages";
-                    })()}
-                  </p>
+
+                  <div className="flex flex-row justify-between items-center">
+                    {/* Left Side - Message Preview */}
+                    <div className="flex justify-start items-start">
+                      <p className="text-gray-400 my-1 text-sm">
+                        {(() => {
+                          const message = chat.latestMessage;
+                          const content = message?.content || message?.fileName;
+
+                          // Find sender in participants
+                          const sender = chat.participants.find(
+                            (participant) =>
+                              participant.id === message?.senderId
+                          );
+
+                          const senderName = sender
+                            ? sender.userName
+                            : "Unknown";
+
+                          if (chat.isGroupChat) {
+                            if (content && content.length > 30) {
+                              return (
+                                <span className="text-gray-600">
+                                  ~ {senderName}: {content.slice(0, 28)}...
+                                </span>
+                              );
+                            }
+                            return `${senderName}: ${
+                              content || "No recent messages"
+                            }`;
+                          } else {
+                            if (content && content.length > 30) {
+                              return `${content.slice(0, 28)}...`;
+                            }
+                            return content || "No recent messages";
+                          }
+                        })()}
+                      </p>
+                    </div>
+
+                    {/* Right Side - Unread Badge */}
+                    {chat.unreadCount > 0 && (
+                      <div className="flex justify-end items-center">
+                        <Badge className="bg-green-500 text-black mx-3 font-bold">
+                          {chat.unreadCount}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </li>

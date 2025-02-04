@@ -1,5 +1,29 @@
 import { prisma } from "../config/db";
 
+export const readMessageService = async ({
+  chatId,
+  userId,
+}: {
+  chatId: string;
+  userId: string;
+}) => {
+  await prisma.message.updateMany({
+    where: {
+      chatId,
+      NOT: {
+        readBy: {
+          has: userId,
+        },
+      },
+    },
+    data: {
+      readBy: {
+        push: userId,
+      },
+    },
+  });
+};
+
 export const getChatMessagesService = async ({
   chatId,
 }: {

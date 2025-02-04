@@ -52,6 +52,10 @@ export const getChatMessages = async (chatId: string) => {
   return await messageApiService.post("", { chatId });
 };
 
+export const readMessage = async (chatId: string) => {
+  return await messageApiService.post("/read-message", { chatId });
+};
+
 export const uploadMessageFile = async (message: FormData) => {
   return await messageApiService.post("/upload-file", message, {
     headers: {

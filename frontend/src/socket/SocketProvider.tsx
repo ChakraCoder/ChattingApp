@@ -7,6 +7,8 @@ import {
   updateLatestMessageOfExistingChat,
   setTypingIndicator,
   clearTypingIndicator,
+  readSelectedChatMessages,
+  setAllExistingChatsData,
 } from "@/app/slice/chatSlice";
 import {
   BACKEND_DEPLOYED_URL,
@@ -24,17 +26,24 @@ interface SocketProviderProps {
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const socket = useRef<Socket | null>(null);
   const userInfo = useAppSelector((state) => state.user);
-  const { selectedChatDetails, allExistingChatsData } = useAppSelector(
-    (state) => state.chat
-  );
+  const { selectedChatDetails, allExistingChatsData, selectedChatMessages } =
+    useAppSelector((state) => state.chat);
   const selectedChatRef = useRef(selectedChatDetails);
   const allExistingChatsRef = useRef(allExistingChatsData);
+  const selectedChatMessagesRef = useRef(selectedChatMessages);
   const dispatch = useAppDispatch();
 
-  // Update ref whenever chats change
   useEffect(() => {
     allExistingChatsRef.current = allExistingChatsData;
   }, [allExistingChatsData]);
+
+  useEffect(() => {
+    selectedChatMessagesRef.current = selectedChatMessages;
+  }, [selectedChatMessages]);
+
+  useEffect(() => {
+    selectedChatRef.current = selectedChatDetails;
+  }, [selectedChatDetails]);
 
   useEffect(() => {
     if (userInfo) {
@@ -119,13 +128,36 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 }
               }
             );
-            // Set typing indicator including sender details
 
-            // Optionally clear the indicator after a delay (e.g., 3 seconds)
             setTimeout(() => {
               dispatch(clearTypingIndicator({ chatId: data.chatId }));
             }, 3000);
           }
+        }
+      );
+
+      socket.current.on(
+        "messagesRead",
+        ({ userId }: { userId: string; chatId: string }) => {
+          selectedChatMessagesRef.current.forEach((message: Message) => {
+            if (!message.readBy.includes(userId)) {
+              dispatch(
+                readSelectedChatMessages({ messageId: message.id, userId })
+              );
+            }
+          });
+        }
+      );
+
+      socket.current.on(
+        "updateUnreadCount",
+        ({ chatId, unreadCount }: { chatId: string; unreadCount: number }) => {
+          const updatedChats = allExistingChatsRef.current.map((existingChat) =>
+            existingChat.id === chatId
+              ? { ...existingChat, unreadCount }
+              : existingChat
+          );
+          dispatch(setAllExistingChatsData(updatedChats));
         }
       );
 
@@ -134,10 +166,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       };
     }
   }, [userInfo, dispatch]);
-
-  useEffect(() => {
-    selectedChatRef.current = selectedChatDetails;
-  }, [selectedChatDetails]);
 
   return (
     <SocketContext.Provider value={socket.current}>

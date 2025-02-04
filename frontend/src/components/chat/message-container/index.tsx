@@ -21,6 +21,7 @@ import { cleanFileName } from "@/utils/utils";
 import { Download } from "lucide-react";
 import { getFileTypeIcon } from "@/utils/getFileTypeIcon";
 import { handleDownload } from "@/utils/handleDownload";
+import { useSocket } from "@/socket/useSocket";
 
 const MessageContainer = () => {
   const { scrollRef, scrollToBottom, disableAutoScroll } = useAutoScroll();
@@ -29,19 +30,40 @@ const MessageContainer = () => {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector((state) => state.user);
   const handleError = useErrorHandler();
-
+  const socket = useSocket();
   // Trigger scroll when new messages arrive
+
+  useEffect(() => {
+    try {
+      if (socket && selectedChatDetails) {
+        if (userInfo.id) {
+          socket.emit("readMessage", {
+            userId: userInfo.id,
+            chatId: selectedChatDetails.id,
+          });
+        }
+      }
+    } catch (error) {
+      handleError(error);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedChatDetails]);
+
   useEffect(() => {
     const fetchChatMessages = async () => {
       try {
         if (selectedChatDetails) {
-          const messages = await getChatMessages(selectedChatDetails.id);
-          dispatch(setSelectedChatMessages(messages.data.data.chatMessage));
+          const response = await getChatMessages(selectedChatDetails.id);
+          const messages = response.data.data.chatMessage;
+
+          // Dispatch messages to Redux
+          dispatch(setSelectedChatMessages(messages));
         }
       } catch (error) {
         handleError(error);
       }
     };
+
     fetchChatMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChatDetails]);
@@ -145,8 +167,18 @@ const MessageContainer = () => {
                     </div>
                   )}
                   {/* Display Image */}
-                  <div className="flex justify-center flex-col">
-                    <div>
+                  <div className="flex flex-col  p-3 rounded-lg shadow-md">
+                    {/* Sender Name (Only for Group Chats) */}
+                    {selectedChatDetails?.chatType === "GROUP" && (
+                      <div className="pb-2">
+                        <span className="text-xs text-gray-500 font-semibold">
+                          ~ {message.sender.userName}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Image Display */}
+                    <div className="flex flex-col items-center">
                       <img
                         src={`${
                           NODE_ENV === "development"
@@ -154,10 +186,22 @@ const MessageContainer = () => {
                             : BACKEND_DEPLOYED_URL
                         }/${message.fileName}`}
                         alt="Sent Image"
-                        className="max-w-[200px] max-h-[200px] rounded-lg border"
+                        className="max-w-[250px] max-h-[250px] rounded-lg border shadow-sm cursor-pointer"
+                        onClick={() =>
+                          window.open(
+                            `${
+                              NODE_ENV === "development"
+                                ? BACKEND_DEVELOPMENT_URL
+                                : BACKEND_DEPLOYED_URL
+                            }/${message.fileName}`,
+                            "_blank"
+                          )
+                        }
                       />
                     </div>
-                    <div className="flex justify-end items-end pt-2">
+
+                    {/* Buttons: Open & Download */}
+                    <div className="flex justify-end pt-3">
                       <button
                         onClick={() =>
                           handleDownload(
@@ -169,15 +213,10 @@ const MessageContainer = () => {
                             message.fileName
                           )
                         }
-                        className="text-blue-500 hover:underline"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center"
                       >
-                        <Download />
+                        <Download className="mt-2 w-6 h-6" />
                       </button>
-                    </div>
-                  </div>
-                  <div className="flex justify-end pt-1">
-                    <div className="text-xs text-neutral-400">
-                      {messageTime}
                     </div>
                   </div>
                 </div>
@@ -207,20 +246,38 @@ const MessageContainer = () => {
                 variant={message.senderId === userInfo.id ? "sent" : "received"}
               >
                 <div className="flex flex-col">
+                  {/* Sender Name for Group Chats */}
                   {selectedChatDetails?.chatType === "GROUP" && (
-                    <div className="flex justify-start pb-3">
-                      <div className="text-xs text-neutral-400">
-                        {`~ ` + message.sender.userName}
-                      </div>
+                    <div className="pb-2">
+                      <span className="text-xs text-gray-500 font-semibold">
+                        ~ {message.sender.userName}
+                      </span>
                     </div>
                   )}
 
-                  {/* Display File Link with Icon */}
-                  <div className="flex items-center gap-2 rounded-lg border-none">
+                  {/* File Display */}
+                  <div className="flex items-center gap-3 p-2 rounded-lg shadow-sm">
+                    {/* File Type Icon */}
                     {getFileTypeIcon(message.fileName)}
-                    <span className="text-sm">
+
+                    {/* Clickable File Name */}
+                    <button
+                      onClick={() =>
+                        window.open(
+                          `${
+                            NODE_ENV === "development"
+                              ? BACKEND_DEVELOPMENT_URL
+                              : BACKEND_DEPLOYED_URL
+                          }/${message.fileName}`,
+                          "_blank"
+                        )
+                      }
+                      className=" hover:underline text-sm font-medium"
+                    >
                       {cleanFileName(message.fileName)}
-                    </span>
+                    </button>
+
+                    {/* Download Button */}
                     <button
                       onClick={() =>
                         handleDownload(
@@ -232,15 +289,15 @@ const MessageContainer = () => {
                           message.fileName
                         )
                       }
-                      className="text-blue-500 hover:underline"
+                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
                     >
-                      <Download />
+                      <Download className="w-6 h-6" />
                     </button>
                   </div>
+
+                  {/* Timestamp */}
                   <div className="flex justify-end pt-1">
-                    <div className="text-xs text-neutral-400">
-                      {messageTime}
-                    </div>
+                    <span className="text-xs text-gray-500">{messageTime}</span>
                   </div>
                 </div>
               </ChatBubbleMessage>

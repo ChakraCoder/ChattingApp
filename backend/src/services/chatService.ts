@@ -130,9 +130,7 @@ export const getAllChatService = async (userId: string) => {
   const chats = await prisma.chat.findMany({
     where: {
       participants: {
-        some: {
-          userId,
-        },
+        some: { userId },
       },
     },
     include: {
@@ -158,32 +156,53 @@ export const getAllChatService = async (userId: string) => {
     },
   });
 
-  // Return the fetched chats
-  return chats.map((chat) => ({
-    id: chat.id,
-    isGroupChat: chat.isGroupChat,
-    groupName: chat.groupName,
-    createdAt: chat.createdAt,
-    updatedAt: chat.updatedAt,
-    participants: chat.participants.map((participant) => ({
-      id: participant.user.id,
-      firstName: participant.user.firstName,
-      lastName: participant.user.lastName,
-      userName: participant.user.userName,
-      profileImage: participant.user.profileImage,
-    })),
-    latestMessage: chat.messages[0]
-      ? {
-          id: chat.messages[0].id,
-          type: chat.messages[0].type,
-          content: chat.messages[0].content,
-          mediaUrl: chat.messages[0].mediaUrl,
-          fileName: chat.messages[0].fileName,
-          timestamp: chat.messages[0].timestamp,
-          senderId: chat.messages[0].senderId,
-        }
-      : null,
-  }));
+  // Fetch unread message count for each chat
+  const unreadCounts = await Promise.all(
+    chats.map(async (chat) => {
+      const unreadCount = await prisma.message.count({
+        where: {
+          chatId: chat.id,
+          NOT: {
+            readBy: { has: userId },
+          },
+        },
+      });
+      return { chatId: chat.id, unreadCount };
+    }),
+  );
+
+  // Map and return the response
+  return chats.map((chat) => {
+    const unreadCount =
+      unreadCounts.find((uc) => uc.chatId === chat.id)?.unreadCount || 0;
+
+    return {
+      id: chat.id,
+      isGroupChat: chat.isGroupChat,
+      groupName: chat.groupName,
+      createdAt: chat.createdAt,
+      updatedAt: chat.updatedAt,
+      participants: chat.participants.map((participant) => ({
+        id: participant.user.id,
+        firstName: participant.user.firstName,
+        lastName: participant.user.lastName,
+        userName: participant.user.userName,
+        profileImage: participant.user.profileImage,
+      })),
+      latestMessage: chat.messages[0]
+        ? {
+            id: chat.messages[0].id,
+            type: chat.messages[0].type,
+            content: chat.messages[0].content,
+            mediaUrl: chat.messages[0].mediaUrl,
+            fileName: chat.messages[0].fileName,
+            timestamp: chat.messages[0].timestamp,
+            senderId: chat.messages[0].senderId,
+          }
+        : null,
+      unreadCount,
+    };
+  });
 };
 
 export const getChatService = async (chatId: string) => {

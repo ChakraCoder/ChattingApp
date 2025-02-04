@@ -20,6 +20,7 @@ export type Message = {
     userName: string;
     profileImage: string;
   };
+  readBy: string[];
   mediaUrl: string;
   createdAt: string;
   updatedAt: string;
@@ -60,6 +61,7 @@ export type ChatDetails = {
   updatedAt: string;
   participants: Participant[];
   latestMessage: LatestMessage | null;
+  unreadCount: number;
 };
 
 // types/chatTypes.ts
