@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
-import helmet from "helmet";
+// import helmet from "helmet";
 import morgan from "morgan";
 import {
   authRoutes,
@@ -20,22 +20,22 @@ import {
 
 const app: Application = express();
 
-app.use(
-  helmet({
-    contentSecurityPolicy: false, // Adjust as needed
-  }),
-);
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: false, // Adjust as needed
+//   }),
+// );
 
 // Middleware to force HTTPS in production environments
-if (NODE_ENV === "production") {
-  app.use((req, res, next) => {
-    if (!req.secure) {
-      res.redirect("https://" + req.hostname + req.url);
-    } else {
-      next();
-    }
-  });
-}
+// if (NODE_ENV === "production") {
+//   app.use((req, res, next) => {
+//     if (!req.secure) {
+//       res.redirect("https://" + req.hostname + req.url);
+//     } else {
+//       next();
+//     }
+//   });
+// }
 
 // Middleware
 app.use(
