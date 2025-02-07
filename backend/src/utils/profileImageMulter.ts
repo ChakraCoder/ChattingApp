@@ -7,7 +7,7 @@ import { OnlyImageFileAreAllowed } from "../errors/userError";
 const profileImageStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Use path to ensure compatibility across platforms
-    cb(null, path.resolve(__dirname, "../uploads/profiles"));
+    cb(null, path.resolve(__dirname, "../opt/render/uploads/profiles"));
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);

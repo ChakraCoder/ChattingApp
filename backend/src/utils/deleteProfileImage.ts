@@ -1,7 +1,11 @@
 import path from "path";
 import fs from "fs";
 export const deleteProfileImage = (fileName: string) => {
-  const filePath = path.resolve(__dirname, "../uploads/profiles/", fileName);
+  const filePath = path.resolve(
+    __dirname,
+    "../opt/render/uploads/profiles/",
+    fileName,
+  );
 
   fs.unlink(filePath, (err) => {
     if (err) {

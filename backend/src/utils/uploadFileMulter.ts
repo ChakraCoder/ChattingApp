@@ -6,7 +6,7 @@ import { FileSizeIsTooLarge } from "../errors/chatError";
 // Configure storage for profile images
 const filesStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.resolve(__dirname, "../uploads/files"));
+    cb(null, path.resolve(__dirname, "../opt/render/uploads/files"));
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
