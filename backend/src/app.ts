@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
+import helmet from "helmet";
 import morgan from "morgan";
 import {
   authRoutes,
@@ -14,9 +15,27 @@ import {
   FRONTEND_DEPLOYED_URL,
   FRONTEND_DEVELOPMENT_URL,
   FRONTEND_ENV,
+  NODE_ENV,
 } from "./config";
 
 const app: Application = express();
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Adjust as needed
+  }),
+);
+
+// Middleware to force HTTPS in production environments
+if (NODE_ENV === "production") {
+  app.use((req, res, next) => {
+    if (!req.secure) {
+      res.redirect("https://" + req.hostname + req.url);
+    } else {
+      next();
+    }
+  });
+}
 
 // Middleware
 app.use(

@@ -68,8 +68,8 @@ const Profile = () => {
           profileImage: userDetailsResponse.data.data.profileImage,
         })
       );
-      setIsLoading(false);
     })();
+    setIsLoading(false);
   }, [dispatch, reset]);
 
   // Check username availability

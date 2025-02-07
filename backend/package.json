@@ -4,6 +4,7 @@
   "description": "Chatting App Backend",
   "main": "index.js",
   "scripts": {
+    "prestart": "tsc",
     "build": "tsc",
     "dev": "dotenv -- nodemon",
     "test": "jest",
@@ -45,6 +46,7 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
