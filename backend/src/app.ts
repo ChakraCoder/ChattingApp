@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
+import fs from "fs";
 // import helmet from "helmet";
 import morgan from "morgan";
 import {
@@ -36,6 +37,18 @@ const app: Application = express();
 //     }
 //   });
 // }
+
+const profileUploadDir = path.join("/opt/render/uploads/profiles");
+const fileUploadDir = path.join("/opt/render/uploads/files");
+
+// Ensure the directory exists
+if (!fs.existsSync(profileUploadDir)) {
+  fs.mkdirSync(profileUploadDir, { recursive: true });
+}
+
+if (!fs.existsSync(fileUploadDir)) {
+  fs.mkdirSync(fileUploadDir, { recursive: true });
+}
 
 // Middleware
 app.use(
