@@ -65,6 +65,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         const existingChat = allExistingChatsRef.current.find(
           (chat) => chat.id === message.chatId
         );
+        console.log("inn1");
 
         if (existingChat) {
           dispatch(
@@ -149,13 +150,47 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         }
       );
 
+      // socket.current.on(
+      //   "updateUnreadCount",
+      //   ({ chatId, unreadCount }: { chatId: string; unreadCount: number }) => {
+      //     console.log("inn2");
+
+      //     const updatedChats = allExistingChatsRef.current.map((existingChat) =>
+      //       existingChat.id === chatId
+      //         ? { ...existingChat, unreadCount }
+      //         : existingChat
+      //     );
+      //     console.log(updatedChats);
+      //     dispatch(setAllExistingChatsData(updatedChats));
+      //   }
+      // );
+
       socket.current.on(
         "updateUnreadCount",
         ({ chatId, unreadCount }: { chatId: string; unreadCount: number }) => {
-          const updatedChats = allExistingChatsRef.current.map((existingChat) =>
-            existingChat.id === chatId
-              ? { ...existingChat, unreadCount }
-              : existingChat
+          // Ensure the chat already exists in the state
+          const existingChat = allExistingChatsRef.current.find(
+            (chat) => chat.id === chatId
+          );
+
+          if (!existingChat) {
+            setTimeout(() => {
+              const existingChat = allExistingChatsRef.current.find(
+                (chat) => chat.id === chatId
+              );
+              if (existingChat) {
+                const updatedChats = allExistingChatsRef.current.map((chat) =>
+                  chat.id === chatId ? { ...chat, unreadCount } : chat
+                );
+                dispatch(setAllExistingChatsData(updatedChats));
+                return;
+              }
+            }, 2000);
+          }
+
+          // Now update the unread count
+          const updatedChats = allExistingChatsRef.current.map((chat) =>
+            chat.id === chatId ? { ...chat, unreadCount } : chat
           );
           dispatch(setAllExistingChatsData(updatedChats));
         }

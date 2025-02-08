@@ -38,8 +38,8 @@ const app: Application = express();
 //   });
 // }
 
-const profileUploadDir = path.join("/opt/render/uploads/profiles");
-const fileUploadDir = path.join("/opt/render/uploads/files");
+const profileUploadDir = path.join("opt/render/uploads/profiles");
+const fileUploadDir = path.join("opt/render/uploads/files");
 
 // Ensure the directory exists
 if (!fs.existsSync(profileUploadDir)) {
@@ -62,8 +62,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "/opt/render/uploads/profiles")));
-app.use(express.static(path.join(__dirname, "/opt/render/uploads/files")));
+app.use(express.static(path.join(__dirname, "opt/render/uploads/profiles")));
+app.use(express.static(path.join(__dirname, "opt/render/uploads/files")));
 
 // Routes
 app.use("/api/auth", authRoutes);

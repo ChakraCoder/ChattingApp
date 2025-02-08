@@ -173,7 +173,7 @@ const Chats = () => {
                     {/* Right Side - Unread Badge */}
                     {chat.unreadCount > 0 && (
                       <div className="flex justify-end items-center">
-                        <Badge className="bg-green-500 text-black mx-3 font-bold">
+                        <Badge className="bg-green-500 hover:bg-green-500 text-black mx-3 font-bold">
                           {chat.unreadCount}
                         </Badge>
                       </div>

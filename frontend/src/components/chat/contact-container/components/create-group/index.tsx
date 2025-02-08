@@ -16,6 +16,7 @@ import { addGroupChat } from "@/apis/chatApiServices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm, Controller } from "react-hook-form";
+import { useSocket } from "@/socket/useSocket";
 
 // Interface for the form data
 interface FormData {
@@ -30,7 +31,9 @@ const CreateGroup = ({
   open: boolean;
   setOpen: (val: boolean) => void;
 }) => {
+  const { selectedChatDetails } = useAppSelector((state) => state.chat);
   const userId = useAppSelector((state) => state.user.id);
+  const socket = useSocket();
   const dispatch = useAppDispatch();
   const handleError = useErrorHandler();
   const {
@@ -109,6 +112,15 @@ const CreateGroup = ({
     participants: string[];
   }) => {
     try {
+      if (selectedChatDetails) {
+        if (socket) {
+          socket.emit("leaveChat", {
+            userId,
+            chatId: selectedChatDetails?.id,
+          });
+        }
+      }
+
       setOpen(false);
       const groupChatAdd = await addGroupChat(payload);
       const { id, groupName, isGroupChat, participants, createdAt, updatedAt } =
@@ -123,6 +135,12 @@ const CreateGroup = ({
           updatedAt,
         })
       );
+      if (socket) {
+        socket.emit("joinChat", {
+          userId,
+          chatId: id,
+        });
+      }
     } catch (error) {
       handleError(error);
     }

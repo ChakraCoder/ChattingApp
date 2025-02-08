@@ -55,7 +55,7 @@ export const uploadFileController = async (
   try {
     if (req.file) {
       req.body.fileName = req.file.filename;
-      req.body.mediaUrl = `/opt/render/uploads/files/${req.body.fileName}`;
+      req.body.mediaUrl = `../opt/render/uploads/files/${req.body.fileName}`;
     }
     const uploadFile = await uploadFileService(req.body);
 

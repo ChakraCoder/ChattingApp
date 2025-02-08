@@ -19,10 +19,10 @@ const Auth = () => {
   ) : (
     <div className="min-h-screen w-full flex items-center justify-center overflow-y-auto">
       <div className="bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vh] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2 pb-5">
-        <div className="flex flex-col gap-10 items-center justify-center">
+        <div className="flex flex-col gap-5 items-center justify-center">
           <div className="flex items-center justify-center flex-col">
-            <h1 className="text-5xl font-bold md:text-6xl">ChakraChat</h1>
-            <p className="font-medium text-center">
+            <h1 className="text-5xl font-bold md:text-4xl">ChakraChat</h1>
+            <p className="font-medium text-center pt-3">
               Fill in the Details to get started with the best chat app!
             </p>
           </div>

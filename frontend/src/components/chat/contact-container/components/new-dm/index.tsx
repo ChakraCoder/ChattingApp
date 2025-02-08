@@ -23,9 +23,11 @@ import {
 } from "@/constants/env";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
-  setSelectedChatDetails
+  setAllExistingChatsData,
+  setSelectedChatDetails,
 } from "@/app/slice/chatSlice";
 import { addIndividualChat } from "@/apis/chatApiServices";
+import { useSocket } from "@/socket/useSocket";
 
 const NewDm = ({
   open,
@@ -35,9 +37,12 @@ const NewDm = ({
   setOpen: (val: boolean) => void;
 }) => {
   const userId = useAppSelector((state) => state.user.id);
-  const { allExistingChatsData } = useAppSelector((state) => state.chat);
+  const { allExistingChatsData, selectedChatDetails } = useAppSelector(
+    (state) => state.chat
+  );
   const dispatch = useAppDispatch();
   const handleError = useErrorHandler();
+  const socket = useSocket();
   const [searchedContacts, setSearchedContacts] = useState<UserState[]>([]);
 
   const searchContacts = async (searchTerm: string) => {
@@ -68,21 +73,59 @@ const NewDm = ({
       );
 
       if (existingChat) {
-        const { id, groupName, isGroupChat, participants, createdAt, updatedAt } =
-          existingChat;
-        dispatch(
-          setSelectedChatDetails({
+        if (selectedChatDetails?.id !== existingChat.id) {
+          if (socket) {
+            socket.emit("leaveChat", {
+              userId,
+              chatId: selectedChatDetails?.id,
+            });
+          }
+
+          const {
             id,
             groupName,
+            isGroupChat,
             participants,
-            chatType: isGroupChat === true ? "GROUP" : "INDIVIDUAL",
             createdAt,
             updatedAt,
-          })
-        );
+          } = existingChat;
+          dispatch(
+            setSelectedChatDetails({
+              id,
+              groupName,
+              participants,
+              chatType: isGroupChat === true ? "GROUP" : "INDIVIDUAL",
+              createdAt,
+              updatedAt,
+            })
+          );
+
+          const updatedChats = allExistingChatsData.map((existingChat) =>
+            existingChat.id === id
+              ? { ...existingChat, unreadCount: 0 }
+              : existingChat
+          );
+
+          dispatch(setAllExistingChatsData(updatedChats));
+
+          if (socket) {
+            socket.emit("joinChat", {
+              userId,
+              chatId: id,
+            });
+          }
+        }
       } else {
         // Ensure that contact.id and userId are not null
         if (contact.id && userId) {
+          if (selectedChatDetails) {
+            if (socket) {
+              socket.emit("leaveChat", {
+                userId,
+                chatId: selectedChatDetails?.id,
+              });
+            }
+          }
           const IndividualChatAdd = await addIndividualChat({
             isGroupChat: false,
             participants: [contact.id, userId],
@@ -106,6 +149,12 @@ const NewDm = ({
               updatedAt,
             })
           );
+          if (socket) {
+            socket.emit("joinChat", {
+              userId,
+              chatId: id,
+            });
+          }
         } else {
           throw new Error("User ID or contact ID is null");
         }
