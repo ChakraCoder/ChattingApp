@@ -4,7 +4,6 @@
   "description": "Chatting App Backend",
   "main": "index.js",
   "scripts": {
-    "prestart": "tsc",
     "build": "tsc",
     "dev": "dotenv -- nodemon",
     "test": "jest",
