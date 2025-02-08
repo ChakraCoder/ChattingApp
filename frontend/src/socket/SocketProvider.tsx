@@ -185,7 +185,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 dispatch(setAllExistingChatsData(updatedChats));
                 return;
               }
-            }, 2000);
+            }, 1000);
           }
 
           // Now update the unread count
