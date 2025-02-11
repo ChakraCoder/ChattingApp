@@ -179,7 +179,6 @@ const setupSocket = (server: Server) => {
               },
             },
           });
-          console.log("unread", unreadCount);
 
           io.to(participantSocketId).emit("updateUnreadCount", {
             chatId,
