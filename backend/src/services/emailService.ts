@@ -28,7 +28,7 @@ export const sendOtpEmail = async (
   try {
     const templatePath = path.join(
       __dirname,
-      "../templates",
+      "../../public/templates",
       "otpTemplate.html",
     );
     const htmlTemplate = fs.readFileSync(templatePath, "utf-8");
@@ -63,7 +63,7 @@ export const sendResetPasswordEmail = async (
 ): Promise<boolean> => {
   const templatePath = path.join(
     __dirname,
-    "../templates",
+    "../../templates",
     "resetPasswordTemplate.html",
   );
   const htmlTemplate = fs.readFileSync(templatePath, "utf-8");
